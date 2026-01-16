@@ -134,7 +134,15 @@ const LayoutBrowser = ({ fetchUrl, layouts }) => {
             <div className="level-info">
               <div className="level-header">
                 <div className="level-title-block">
-                  <h2 className="level-name">{level.levelName}</h2>
+                  <h2 className="level-name">
+                    <a
+                      href={`https://gdbrowser.com/${level.levelId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {level.levelName}
+                    </a>
+                  </h2>
                   <span className="difficulty-value-label">{level.difficulty}</span>
                   {getTypeIcon(level.type) && (
                     <img

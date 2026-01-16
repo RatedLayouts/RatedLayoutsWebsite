@@ -94,6 +94,18 @@
     letter-spacing: 1px;
 }
 
+.level-name a {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: inline-block;
+}
+
+.level-name a:hover {
+    transform: scale(1.05);
+}
+
 .level-author {
     font-size: 2rem;
     font-weight: 700;
