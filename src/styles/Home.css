@@ -1,0 +1,90 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.intro-card {
+  padding: 4rem;
+  text-align: center;
+  width: 100%;
+  max-width: 950px;
+}
+
+.title-image {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin-bottom: 3rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex: 0 0 auto;
+}
+
+.menu-button img {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+  transition: all 0.2s ease;
+}
+
+.menu-button:hover img {
+  transform: scale(1.1);
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.4));
+}
+
+.menu-button:active {
+  transform: scale(0.9);
+  transition: transform 0.1s ease-out;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+@media (min-width: 1024px) {
+  .intro-card {
+    max-width: 1300px;
+  }
+
+  .title-image {
+    max-width: 800px;
+  }
+
+  .menu-button img {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+.credits-text {
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 1);
+  font-family: Helvetica, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  -webkit-text-stroke: 0px rgba(0, 0, 0, 0);
+  paint-order: stroke fill;
+}
