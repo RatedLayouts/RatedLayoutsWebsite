@@ -21,9 +21,9 @@ function Home() {
 
   return (
     <div className="container">
+      <h1 style={{ color: 'orange', textAlign: 'center' }}>Still Work-in-progress</h1>
       <div className="intro-card glass">
         <img src="/RL_title.png" alt="Rated Layouts" className="title-image" />
-
         <div className="button-grid">
           {buttons.map((btn) => (
             <button
@@ -35,7 +35,6 @@ function Home() {
             </button>
           ))}
         </div>
-
         <div className="credits-text">
           <p>💝 Geode Mod and Website created by <b>ArcticWoof</b></p>
           <p>💫 Rated Layouts Assets created by <b>Dasshu & Darkore</b></p>

@@ -1,0 +1,185 @@
+.leaderboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 5rem;
+    padding: 1rem;
+}
+
+.leaderboard-filters {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border-radius: 12px;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    -webkit-text-stroke: 3px black;
+    paint-order: stroke fill;
+}
+
+.filter-btn:hover {
+    transform: scale(1.05);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.filter-btn.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.filter-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: transform 0.2s ease;
+    border-radius: 16px;
+    position: relative;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 30px solid transparent;
+    border-image-source: url('/RL_blank01.png');
+    border-image-slice: 400 fill;
+    border-image-width: 15px;
+    border-image-repeat: stretch;
+    margin: 1rem;
+}
+
+
+.user-card:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-rank {
+    font-size: 3rem;
+    font-weight: 900;
+    font-family: var(--font-main);
+    color: white;
+    -webkit-text-stroke: 4px black;
+    paint-order: stroke fill;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+    min-width: 60px;
+    text-align: center;
+}
+
+/* Gold, Silver, Bronze styling for top 3 */
+.user-card:nth-child(1) .user-rank {
+    color: #FFD700;
+}
+
+.user-card:nth-child(2) .user-rank {
+    color: #C0C0C0;
+}
+
+.user-card:nth-child(3) .user-rank {
+    color: #CD7F32;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    gap: 0.5rem;
+}
+
+.user-name {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--font-main);
+    color: white;
+    -webkit-text-stroke: 3px black;
+    paint-order: stroke fill;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
+}
+
+.user-name:hover {
+    transform: scale(1.05);
+    color: white;
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.5));
+    transition: all 0.2s ease;
+}
+
+.user-stats {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stat-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.5));
+}
+
+.stat-value {
+    font-family: var(-font-main);
+    font-size: 1.2rem;
+    color: white;
+    filter: drop-shadow(1px 1px 0px rgba(0, 0, 0, 0.5));
+}
+
+.leaderboard-loading {
+    color: white;
+    text-align: center;
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-main);
+}
+
+.leaderboard-error {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    color: rgb(255, 100, 100);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-main);
+}
+
+.user-badge {
+    height: 2em;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
+    transition: transform 0.2s ease;
+}
+
+.user-badge:hover {
+    transform: scale(1.2);
+}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import '../styles/LayoutBrowser.css';
 
-const LayoutBrowser = ({ fetchUrl }) => {
+const LayoutBrowser = ({ fetchUrl, layouts }) => {
   const [levels, setLevels] = useState([]);
   const [meta, setMeta] = useState({ totalAmount: 0, page: 1, amount: 10 });
   const [page, setPage] = useState(1);
@@ -10,6 +10,17 @@ const LayoutBrowser = ({ fetchUrl }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (layouts) {
+      setLevels(layouts);
+      setMeta({
+        totalAmount: layouts.length,
+        page: 1,
+        amount: layouts.length
+      });
+      setLoading(false);
+      return;
+    }
+
     const fetchLevels = async () => {
       try {
         setLoading(true);
@@ -48,7 +59,7 @@ const LayoutBrowser = ({ fetchUrl }) => {
     if (fetchUrl) {
       fetchLevels();
     }
-  }, [fetchUrl, page]);
+  }, [fetchUrl, page, layouts]);
 
   const handlePrevPage = () => {
     if (page > 1) setPage(p => p - 1);

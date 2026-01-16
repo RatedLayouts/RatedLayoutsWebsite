@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import Featured from './Featured';
+import Leaderboard from './Leaderboard';
+import Gauntlets from './Gauntlets';
 import GenericPage from './GenericPage';
 import PageLayout from './components/PageLayout';
 
@@ -16,11 +18,11 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          
+
           <Route element={<PageLayout />}>
             <Route path="/featured" element={<Featured />} />
-            <Route path="/leaderboard" element={<GenericPage title="Leaderboard" />} />
-            <Route path="/gauntlets" element={<GenericPage title="Gauntlets" />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/gauntlets" element={<Gauntlets />} />
             <Route path="/sent" element={<GenericPage title="Sent Layouts" />} />
             <Route path="/search" element={<GenericPage title="Search" />} />
             <Route path="/daily" element={<GenericPage title="Daily Layout" />} />
