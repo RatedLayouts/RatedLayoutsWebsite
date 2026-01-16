@@ -188,7 +188,7 @@ a:hover {
   max-width: 90%;
 }
 
-@media (max-width: 1025px) {
+@media (max-width: 925px) {
   .mobile-blocker {
     display: flex;
   }
