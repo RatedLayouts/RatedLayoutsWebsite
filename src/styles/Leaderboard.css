@@ -90,15 +90,16 @@
 }
 
 /* Gold, Silver, Bronze styling for top 3 */
-.user-card:nth-child(1) .user-rank {
+/* Gold, Silver, Bronze styling for top 3 */
+.user-rank.rank-1 {
     color: #FFD700;
 }
 
-.user-card:nth-child(2) .user-rank {
+.user-rank.rank-2 {
     color: #C0C0C0;
 }
 
-.user-card:nth-child(3) .user-rank {
+.user-rank.rank-3 {
     color: #CD7F32;
 }
 
@@ -182,4 +183,67 @@
 
 .user-badge:hover {
     transform: scale(1.2);
+}
+
+/* Pagination Styles borrowed from LayoutBrowser.css */
+.page-counter {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 100;
+
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+
+    padding: 0.75rem 1.5rem;
+
+    font-family: var(--font-main);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.pagination-bottom {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 100;
+}
+
+.nav-btn-glass {
+    background-color: var(--glass-bg);
+    border: 2px solid var(--glass-border);
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.nav-btn-glass:hover:not(:disabled) {
+    transform: scale(1.1);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-btn-glass:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

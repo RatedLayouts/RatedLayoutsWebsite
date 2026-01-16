@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import '../styles/LayoutBrowser.css';
 
-const LayoutBrowser = ({ fetchUrl, layouts }) => {
+const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {} }) => {
   const [levels, setLevels] = useState([]);
   const [meta, setMeta] = useState({ totalAmount: 0, page: 1, amount: 10 });
   const [page, setPage] = useState(1);
@@ -29,7 +29,7 @@ const LayoutBrowser = ({ fetchUrl, layouts }) => {
         const url = new URL(urlStr);
         url.searchParams.set('page', page);
 
-        const response = await fetch(url.toString());
+        const response = await fetch(url.toString(), fetchOptions);
         if (!response.ok) {
           throw new Error('Failed to fetch levels');
         }
@@ -55,9 +55,22 @@ const LayoutBrowser = ({ fetchUrl, layouts }) => {
     };
 
     if (fetchUrl) {
-      fetchLevels();
+      if (fetchOptions.method === 'POST' && fetchOptions.body) {
+        // If POST with body, we need to make sure the effect only triggers when body actually changes
+        // Use JSON stringify to compare dependencies or assume parent handles stability
+        fetchLevels();
+      } else {
+        fetchLevels();
+      }
     }
-  }, [fetchUrl, page, layouts]);
+    // To properly support POST body updates, we should include fetchOptions in dependencies,
+    // but deep object comparison in deps is tricky.
+    // Relying on `fetchUrl` changing or `page` changing.
+    // However, for search, fetchOptions (body) changes when user searches.
+    // We can assume parent changes `fetchUrl` or we verify `fetchOptions` stability.
+    // A simpler way: stringify fetchOptions.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchUrl, page, layouts, JSON.stringify(fetchOptions)]);
 
   const handlePrevPage = () => {
     if (page > 1) setPage(p => p - 1);
@@ -113,7 +126,7 @@ const LayoutBrowser = ({ fetchUrl, layouts }) => {
 
       </div>
       <div className="layout-browser-container glass">
-        {loading && <div className="layout-browser-overlay">Loading...</div>}
+        {loading && <div className="layout-browser-overlay glass">Loading...</div>}
         {levels.length === 0 ? (
           <div style={{ textAlign: 'center', width: '100%', padding: '3rem', fontSize: '2rem', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
             No Layouts Found

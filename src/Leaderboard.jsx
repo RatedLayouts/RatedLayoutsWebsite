@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './styles/Leaderboard.css';
 
 const Leaderboard = () => {
     const [users, setUsers] = useState([]);
     const [type, setType] = useState(1);
+    const [page, setPage] = useState(1);
+    const [meta, setMeta] = useState({ total: 0, page: 1, amount: 100 });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -11,18 +14,25 @@ const Leaderboard = () => {
         const fetchLeaderboard = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`https://gdrate.arcticwoof.xyz/v1/getLeaderboard?type=${type}`);
+                const response = await fetch(`https://gdrate.arcticwoof.xyz/v1/getLeaderboard?type=${type}&page=${page}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch leaderboard');
                 }
                 const data = await response.json();
                 if (data && Array.isArray(data.leaderboard)) {
                     setUsers(data.leaderboard);
+                    setMeta({
+                        total: data.total || 0,
+                        page: data.page || 1,
+                        amount: data.amount || 100
+                    });
                 } else if (Array.isArray(data)) {
-
+                    // Fallback for non-paginated response if any
                     setUsers(data);
+                    setMeta({ total: data.length, page: 1, amount: data.length });
                 } else {
                     setUsers([]);
+                    setMeta({ total: 0, page: 1, amount: 100 });
                 }
                 setError(null);
             } catch (err) {
@@ -34,7 +44,21 @@ const Leaderboard = () => {
         };
 
         fetchLeaderboard();
-    }, [type]);
+    }, [type, page]);
+
+    const handlePrevPage = () => {
+        if (page > 1) setPage(p => p - 1);
+    };
+
+    const handleNextPage = () => {
+        const maxPage = Math.ceil(meta.total / meta.amount);
+        if (page < maxPage) setPage(p => p + 1);
+    };
+
+    const firstItem = (meta.page - 1) * meta.amount + 1;
+    const lastItem = Math.min((meta.page - 1) * meta.amount + users.length, meta.total);
+    const displayFirst = users.length > 0 ? firstItem : 0;
+    const displayLast = users.length > 0 ? lastItem : 0;
 
     const filterTypes = [
         { id: 1, label: 'Sparks', icon: '/RL_sparkBig.png' },
@@ -45,6 +69,7 @@ const Leaderboard = () => {
 
     const handleFilterClick = (typeId) => {
         setType(typeId);
+        setPage(1); // Reset to page 1 when filter changes
     };
 
     return (
@@ -53,6 +78,13 @@ const Leaderboard = () => {
                 <img src="/RL_BlueCoin.png" alt="" className="page-title-icon" />
                 Leaderboard
             </h1>
+
+            <div className="page-counter glass">
+                <span className="page-text">
+                    {displayFirst} to {displayLast} of {meta.total}
+                </span>
+            </div>
+
             <div className="leaderboard-container glass">
                 <div className="leaderboard-filters">
                     {filterTypes.map((t) => (
@@ -72,58 +104,79 @@ const Leaderboard = () => {
 
                 {!loading && !error && (
                     <div className="users-list">
-                        {users.map((user, index) => (
-                            <div key={user.accountId || index} className="user-card glass">
-                                <div className="user-rank">{index + 1}</div>
-                                <div className="user-info">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <a
-                                            href={`https://gdbrowser.com/u/${user.accountId}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="user-name"
-                                        >
-                                            {user.username}
-                                        </a>
-                                        {user.accountId === 7689052 ? (
-                                            <img src="/RL_badgeOwner.png" alt="Rated Layouts Owner" className="user-badge" title="Rated Layouts Owner" />
-                                        ) : (
-                                            <>
-                                                {user.isSupporter && (
-                                                    <img src="/RL_badgeSupporter.png" alt="Layout Supporter" className="user-badge" title="Layout Supporter" />
-                                                )}
-                                                {user.modRole === 2 && (
-                                                    <img src="/RL_badgeAdmin01.png" alt="Layout Admin" className="user-badge" title="Layout Admin" />
-                                                )}
-                                                {user.modRole === 1 && (
-                                                    <img src="/RL_badgeMod01.png" alt="Layout Moderator" className="user-badge" title="Layout Moderator" />
-                                                )}
-                                            </>
-                                        )}
-                                    </div>
-                                    <div className="user-stats">
-                                        <div className="stat-item" title="Sparks">
-                                            <img src="/RL_sparkBig.png" alt="Sparks" className="stat-icon" />
-                                            <span className="stat-value">{user.sparks}</span>
+                        {users.map((user, index) => {
+                            const rank = user.rank || ((page - 1) * meta.amount + index + 1);
+                            return (
+                                <div key={user.accountId || index} className="user-card glass">
+                                    <div className={`user-rank rank-${rank}`}>{rank}</div>
+                                    <div className="user-info">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <a
+                                                href={`https://gdbrowser.com/u/${user.accountId}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="user-name"
+                                            >
+                                                {user.username}
+                                            </a>
+                                            {user.accountId === 7689052 ? (
+                                                <img src="/RL_badgeOwner.png" alt="Rated Layouts Owner" className="user-badge" title="Rated Layouts Owner" />
+                                            ) : (
+                                                <>
+                                                    {user.isSupporter && (
+                                                        <img src="/RL_badgeSupporter.png" alt="Layout Supporter" className="user-badge" title="Layout Supporter" />
+                                                    )}
+                                                    {user.modRole === 2 && (
+                                                        <img src="/RL_badgeAdmin01.png" alt="Layout Admin" className="user-badge" title="Layout Admin" />
+                                                    )}
+                                                    {user.modRole === 1 && (
+                                                        <img src="/RL_badgeMod01.png" alt="Layout Moderator" className="user-badge" title="Layout Moderator" />
+                                                    )}
+                                                </>
+                                            )}
                                         </div>
-                                        <div className="stat-item" title="Planets">
-                                            <img src="/RL_planetBig.png" alt="Planets" className="stat-icon" />
-                                            <span className="stat-value">{user.planets}</span>
-                                        </div>
-                                        <div className="stat-item" title="Creator Points">
-                                            <img src="/RL_blueprintPoint01.png" alt="Creator Points" className="stat-icon" />
-                                            <span className="stat-value">{user.creatorPoints}</span>
-                                        </div>
-                                        <div className="stat-item" title="Blue Coins">
-                                            <img src="/RL_BlueCoin.png" alt="Coins" className="stat-icon" />
-                                            <span className="stat-value">{user.blueCoins}</span>
+                                        <div className="user-stats">
+                                            <div className="stat-item" title="Sparks">
+                                                <img src="/RL_sparkBig.png" alt="Sparks" className="stat-icon" />
+                                                <span className="stat-value">{user.sparks}</span>
+                                            </div>
+                                            <div className="stat-item" title="Planets">
+                                                <img src="/RL_planetBig.png" alt="Planets" className="stat-icon" />
+                                                <span className="stat-value">{user.planets}</span>
+                                            </div>
+                                            <div className="stat-item" title="Creator Points">
+                                                <img src="/RL_blueprintPoint01.png" alt="Creator Points" className="stat-icon" />
+                                                <span className="stat-value">{user.creatorPoints}</span>
+                                            </div>
+                                            <div className="stat-item" title="Blue Coins">
+                                                <img src="/RL_BlueCoin.png" alt="Coins" className="stat-icon" />
+                                                <span className="stat-value">{user.blueCoins}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
+            </div>
+
+            <div className="pagination-bottom">
+                <button
+                    onClick={handlePrevPage}
+                    disabled={page <= 1}
+                    className="nav-btn-glass glass"
+                >
+                    <ChevronLeft size={32} />
+                </button>
+
+                <button
+                    onClick={handleNextPage}
+                    disabled={page >= Math.ceil(meta.total / meta.amount)}
+                    className="nav-btn-glass glass"
+                >
+                    <ChevronRight size={32} />
+                </button>
             </div>
         </div>
     );

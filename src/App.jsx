@@ -10,14 +10,15 @@ import GenericPage from './GenericPage';
 import PageLayout from './components/PageLayout';
 import { Analytics } from "@vercel/analytics/react";
 import SentLayouts from './SentLayouts';
+import Search from './Search';
 
 function App() {
   return (
     <>
       <div className="mobile-blocker">
         <div className="mobile-blocker-content glass">
-          <h1>Screen Too Small</h1>
-          <p>Your screen is not wide enough to view this website.</p>
+          <h1>Your screen width is too small</h1>
+          <p>You unable to view this page on your device. Either rotate your device or use a larger screen.</p>
         </div>
       </div>
       <Router>
@@ -29,7 +30,7 @@ function App() {
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/gauntlets" element={<Gauntlets />} />
             <Route path="/sent" element={<SentLayouts />} />
-            <Route path="/search" element={<GenericPage title="Search" />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/daily" element={<Daily />} />
             <Route path="/weekly" element={<Weekly />} />
             <Route path="/monthly" element={<Monthly />} />
