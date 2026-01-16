@@ -12,7 +12,7 @@ const Gauntlets = () => {
         const fetchGauntlets = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://gdrate.arcticwoof.xyz/v1/getGauntlets');
+                const response = await fetch('/v1/getGauntlets');
                 if (!response.ok) {
                     throw new Error('Failed to fetch gauntlets');
                 }

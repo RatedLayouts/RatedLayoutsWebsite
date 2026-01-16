@@ -5,10 +5,10 @@ import './styles/SentLayouts.css';
 function SentLayouts() {
     const [username, setUsername] = useState('');
     const [accountId, setAccountId] = useState('');
-    const [fetchUrl, setFetchUrl] = useState('https://gdrate.arcticwoof.xyz/v1/getSends');
+    const [fetchUrl, setFetchUrl] = useState('/v1/getSends');
 
     const handleSearch = () => {
-        const url = new URL('https://gdrate.arcticwoof.xyz/v1/getSends');
+        const url = new URL('/v1/getSends', window.location.origin);
         if (username.trim()) {
             url.searchParams.set('username', username.trim());
         }

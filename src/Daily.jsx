@@ -10,7 +10,7 @@ const Daily = () => {
         const fetchDaily = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://gdrate.arcticwoof.xyz/v1/getDaily');
+                const response = await fetch('/v1/getDaily');
                 if (!response.ok) {
                     throw new Error('Failed to fetch daily levels');
                 }

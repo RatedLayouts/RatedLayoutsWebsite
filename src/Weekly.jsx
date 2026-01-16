@@ -10,7 +10,7 @@ const Weekly = () => {
         const fetchWeekly = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://gdrate.arcticwoof.xyz/v1/getWeekly');
+                const response = await fetch('/v1/getWeekly');
                 if (!response.ok) {
                     throw new Error('Failed to fetch weekly levels');
                 }

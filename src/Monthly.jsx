@@ -10,7 +10,7 @@ const Monthly = () => {
         const fetchMonthly = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('https://gdrate.arcticwoof.xyz/v1/getMonthly');
+                const response = await fetch('/v1/getMonthly');
                 if (!response.ok) {
                     throw new Error('Failed to fetch monthly levels');
                 }
