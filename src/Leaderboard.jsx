@@ -11,7 +11,7 @@ const Leaderboard = () => {
         const fetchLeaderboard = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(`/api/v1/getLeaderboard?type=${type}`);
+                const response = await fetch(`https://gdrate.arcticwoof.xyz/v1/getLeaderboard?type=${type}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch leaderboard');
                 }

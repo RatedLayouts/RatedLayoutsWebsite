@@ -7,7 +7,7 @@ function Featured() {
         <img src="/RL_sparkBig.png" alt="" className="page-title-icon" />
         Featured Layouts
       </h1>
-      <LayoutBrowser fetchUrl="/api/v1/getFeatured" />
+      <LayoutBrowser fetchUrl="https://gdrate.arcticwoof.xyz/v1/getFeatured" />
     </div>
   );
 }
