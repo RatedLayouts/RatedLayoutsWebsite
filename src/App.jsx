@@ -5,7 +5,7 @@ import Leaderboard from './Leaderboard';
 import Gauntlets from './Gauntlets';
 import GenericPage from './GenericPage';
 import PageLayout from './components/PageLayout';
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   return (
@@ -16,7 +16,6 @@ function App() {
           <p>Your screen is not wide enough to view this website.</p>
         </div>
       </div>
-      <Analytics />
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -33,6 +32,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      <Analytics />
     </>
   );
 }
