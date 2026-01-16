@@ -34,6 +34,7 @@ const LayoutBrowser = ({ fetchUrl, layouts }) => {
           throw new Error('Failed to fetch levels');
         }
         const data = await response.json();
+        // The API returns { layouts: [...], totalAmount, page, amount }
         if (data && data.layouts) {
           setLevels(data.layouts);
           setMeta({
