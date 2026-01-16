@@ -9,7 +9,7 @@ const Search = () => {
 
     // Form State
     const [formData, setFormData] = useState({
-        type: 'classic',
+        type: 'any',
         award: false,
         featured: false,
         epic: false,
@@ -30,7 +30,6 @@ const Search = () => {
     const handleSearch = () => {
         // Convert boolean/checkbox states to API expected integers (1 or 0)
         const requestBody = {
-            type: formData.type,
             award: formData.award ? 1 : 0,
             featured: formData.featured ? 1 : 0,
             epic: formData.epic ? 1 : 0,
@@ -38,6 +37,10 @@ const Search = () => {
             username: formData.username,
             query: formData.query
         };
+
+        if (formData.type !== 'any') {
+            requestBody.type = formData.type;
+        }
 
         const difficulty = parseInt(formData.difficulty) || 0;
         if (difficulty !== 0) {
@@ -108,6 +111,7 @@ const Search = () => {
                                     onChange={handleInputChange}
                                     className="search-select"
                                 >
+                                    <option value="any">Any</option>
                                     <option value="classic">Classic</option>
                                     <option value="platformer">Platformer</option>
                                 </select>
