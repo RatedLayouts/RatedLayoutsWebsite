@@ -1,0 +1,71 @@
+.sent-search-container {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+}
+
+.sent-inputs-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.sent-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sent-input-label {
+    font-weight: bold;
+}
+
+.sent-input-field {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    font-family: var(--font-main);
+}
+
+.sent-search-button {
+    padding: 0.75rem;
+    color: white;
+    font-weight: 800;
+    font-family: var(--font-main);
+    cursor: pointer;
+    font-size: 1.1rem;
+
+    /* 9-slice styling similar to view-level-button */
+    border: 15px solid transparent;
+    border-image-source: url('/RL_blank01.png');
+    border-image-slice: 400 fill;
+    border-image-width: 10px;
+    border-image-repeat: stretch;
+    background: transparent;
+    /* Background handled by border-image fill */
+
+    -webkit-text-stroke: 4px black;
+    paint-order: stroke fill;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+
+    transition: transform 0.2s ease, filter 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sent-search-button:hover {
+    transform: scale(1.02);
+    filter: drop-shadow(5px 5px 0px rgba(0, 0, 0, 0.5)) brightness(1.2);
+}
+
+.sent-search-button:active {
+    transform: scale(0.98);
+}

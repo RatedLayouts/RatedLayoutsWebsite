@@ -9,6 +9,7 @@ import Gauntlets from './Gauntlets';
 import GenericPage from './GenericPage';
 import PageLayout from './components/PageLayout';
 import { Analytics } from "@vercel/analytics/react";
+import SentLayouts from './SentLayouts';
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
             <Route path="/featured" element={<Featured />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/gauntlets" element={<Gauntlets />} />
-            <Route path="/sent" element={<GenericPage title="Sent Layouts" />} />
+            <Route path="/sent" element={<SentLayouts />} />
             <Route path="/search" element={<GenericPage title="Search" />} />
             <Route path="/daily" element={<Daily />} />
             <Route path="/weekly" element={<Weekly />} />

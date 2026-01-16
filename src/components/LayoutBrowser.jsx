@@ -114,66 +114,97 @@ const LayoutBrowser = ({ fetchUrl, layouts }) => {
       </div>
       <div className="layout-browser-container glass">
         {loading && <div className="layout-browser-overlay">Loading...</div>}
-        {levels.map((level) => (
-          <div key={level.levelId} className="level-card glass">
-            <span className="featured-score">Featured Score: {level.featuredScore}</span>
-            <div className="level-difficulty-container">
-              {getFeaturedCoin(level.featured) && (
-                <img
-                  src={getFeaturedCoin(level.featured)}
-                  alt="Featured Coin"
-                  className={`featured-coin-bg ${level.featured === 2 ? 'epic-coin' : ''}`}
-                />
-              )}
-              <img
-                src={getDifficultyAsset(level.difficulty)}
-                alt={`Difficulty ${level.difficulty}`}
-                className={`difficulty-icon ${isDemon(level.difficulty) ? 'difficulty-icon-demon' : ''}`}
-              />
-            </div>
-            <div className="level-info">
-              <div className="level-header">
-                <div className="level-title-block">
-                  <h2 className="level-name">
-                    <a
-                      href={`https://gdbrowser.com/${level.levelId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {level.levelName}
-                    </a>
-                  </h2>
-                  <span className="difficulty-value-label">{level.difficulty}</span>
-                  {getTypeIcon(level.type) && (
+        {levels.length === 0 ? (
+          <div style={{ textAlign: 'center', width: '100%', padding: '3rem', fontSize: '2rem', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+            No Layouts Found
+          </div>
+        ) : (
+          levels.map((level) => {
+            let difficulty = level.difficulty;
+            if (!difficulty && level.averageDifficulty) {
+              const avg = Math.round(level.averageDifficulty);
+              difficulty = avg >= 10 ? Math.round(level.averageDifficulty / 5) * 5 : avg;
+            }
+            difficulty = difficulty || 0;
+            const score = level.featuredScore !== undefined ? level.featuredScore : level.totalSuggests;
+            const scoreLabel = level.featuredScore !== undefined ? "Featured Score" : "Total Suggests";
+            const levelName = level.levelName || `Level ID: ${level.levelId}`;
+            const isDemonValue = isDemon(difficulty);
+
+            return (
+              <div key={level.levelId} className="level-card glass">
+                {level.featuredScore !== undefined && (
+                  <span className="featured-score">Featured Score: {level.featuredScore}</span>
+                )}
+                <div className="level-difficulty-container">
+                  {getFeaturedCoin(level.featured) && (
                     <img
-                      src={getTypeIcon(level.type)}
-                      alt={level.type}
-                      className="type-icon"
+                      src={getFeaturedCoin(level.featured)}
+                      alt="Featured Coin"
+                      className={`featured-coin-bg ${level.featured === 2 ? 'epic-coin' : ''}`}
                     />
                   )}
+                  <img
+                    src={getDifficultyAsset(difficulty)}
+                    alt={`Difficulty ${difficulty}`}
+                    className={`difficulty-icon ${isDemonValue ? 'difficulty-icon-demon' : ''}`}
+                  />
                 </div>
+                <div className="level-info">
+                  <div className="level-header">
+                    <div className="level-title-block">
+                      <h2 className="level-name">
+                        <a
+                          href={`https://gdbrowser.com/${level.levelId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {levelName}
+                        </a>
+                      </h2>
+                      <span className="difficulty-value-label">
+                        {level.featuredScore === undefined ? "Avg Diff: " : ""}
+                        {difficulty}
+                      </span>
+                      {getTypeIcon(level.type) && (
+                        <img
+                          src={getTypeIcon(level.type)}
+                          alt={level.type}
+                          className="type-icon"
+                        />
+                      )}
+                    </div>
+                  </div>
+                  {level.totalSuggests !== undefined && (
+                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: '#ddd', marginTop: '0.2rem', marginBottom: '0.2rem', fontFamily: 'Helvetica, sans-serif', fontWeight: 'bold' }}>
+                      <span>Total Suggests: {level.totalSuggests}</span>
+                      {level.suggestedFeatured > 0 && <span>Featured: {level.suggestedFeatured}</span>}
+                      {level.suggestedEpic > 0 && <span>Epic: {level.suggestedEpic}</span>}
+                    </div>
+                  )}
+                  {level.creatorUsername && (
+                    <a
+                      href={`https://gdbrowser.com/u/${level.creatorAccountId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="level-author"
+                      data-text={`by ${level.creatorUsername}`}
+                    >
+                      by {level.creatorUsername}
+                    </a>
+                  )}
+                </div>
+                <a
+                  href={`https://gdbrowser.com/${level.levelId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="view-level-button"
+                >
+                  VIEW
+                </a>
               </div>
-              <a
-                href={`https://gdbrowser.com/u/${level.creatorAccountId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="level-author"
-                data-text={`by ${level.creatorUsername}`}
-              >
-                by {level.creatorUsername}
-              </a>
-              {/* Add more info like type, song, etc. if needed */}
-            </div>
-            <a
-              href={`https://gdbrowser.com/${level.levelId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="view-level-button"
-            >
-              VIEW
-            </a>
-          </div>
-        ))}
+            )
+          }))}
       </div>
 
       <div className="pagination-bottom">
