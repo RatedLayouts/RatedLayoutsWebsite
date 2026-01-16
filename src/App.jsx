@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Daily from './Daily';
+import Weekly from './Weekly';
+import Monthly from './Monthly';
 import Home from './Home';
 import Featured from './Featured';
 import Leaderboard from './Leaderboard';
@@ -26,9 +29,9 @@ function App() {
             <Route path="/gauntlets" element={<Gauntlets />} />
             <Route path="/sent" element={<GenericPage title="Sent Layouts" />} />
             <Route path="/search" element={<GenericPage title="Search" />} />
-            <Route path="/daily" element={<GenericPage title="Daily Layout" />} />
-            <Route path="/weekly" element={<GenericPage title="Weekly Layout" />} />
-            <Route path="/monthly" element={<GenericPage title="Monthly Layout" />} />
+            <Route path="/daily" element={<Daily />} />
+            <Route path="/weekly" element={<Weekly />} />
+            <Route path="/monthly" element={<Monthly />} />
           </Route>
         </Routes>
       </Router>

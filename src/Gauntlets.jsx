@@ -41,8 +41,8 @@ const Gauntlets = () => {
                 Layout Gauntlets
             </h1>
 
-            {loading && <div className="glass" style={{ padding: '2rem', textAlign: 'center' }}>Loading Gauntlets...</div>}
-            {error && <div className="glass" style={{ padding: '2rem', textAlign: 'center', color: 'red' }}>Error: {error}</div>}
+            {loading && <div className="layout-browser-loading glass" style={{ margin: '2rem auto', width: 'fit-content', padding: '1rem 3rem' }}>Loading Gauntlets...</div>}
+            {error && <div className="layout-browser-loading glass" style={{ margin: '2rem auto', width: 'fit-content', padding: '1rem 3rem', color: 'red' }}>Error: {error}</div>}
 
             {!loading && !error && (
                 <div className="gauntlets-container">

@@ -101,8 +101,8 @@ const LayoutBrowser = ({ fetchUrl, layouts }) => {
     return null;
   };
 
-  if (loading && levels.length === 0) return <div className="layout-browser-loading">Loading levels...</div>;
-  if (error) return <div className="layout-browser-error">Error: {error}</div>;
+  if (loading && levels.length === 0) return <div className="layout-browser-loading glass">Loading levels...</div>;
+  if (error) return <div className="layout-browser-error glass">Error: {error}</div>;
 
   return (
     <>
