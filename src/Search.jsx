@@ -48,7 +48,7 @@ const Search = () => {
         }
 
         setFetchConfig({
-            url: '/v1/getLayouts',
+            url: 'https://gdrate.arcticwoof.xyz/v1/getLayouts',
             options: {
                 method: 'POST',
                 headers: {
