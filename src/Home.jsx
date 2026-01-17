@@ -47,7 +47,7 @@ function Home() {
           <p>🧊 Original Assets and Images by <b>RobTop Games</b></p>
         </div>
         <button
-          className="profile-float-btn glass"
+          className="profile-float-btn"
           onClick={() => handleNavigation('/profile')}
           title="User Profile"
         >
