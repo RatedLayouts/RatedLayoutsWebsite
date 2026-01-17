@@ -59,6 +59,7 @@
     margin-bottom: 0.2rem;
     color: var(--text-primary);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    -webkit-text-stroke: 5px black;
     paint-order: stroke fill;
 }
 
@@ -68,6 +69,8 @@
     gap: 0.1rem;
     font-size: 1rem;
     letter-spacing: 0.5rem;
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
     color: var(--text-primary);
 }
 

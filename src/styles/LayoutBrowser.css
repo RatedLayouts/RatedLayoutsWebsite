@@ -3,7 +3,7 @@
     flex-direction: column;
     gap: 1rem;
     width: 100%;
-    max-width: 900px;
+    max-width: 1200px;
     margin-bottom: 5rem;
     padding: 1rem 1rem 1rem;
 }
@@ -124,12 +124,7 @@
 .level-author {
     font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(180deg, #fea711 0%, #fee348 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
-    -webkit-text-stroke: .5px black;
-    paint-order: stroke fill;
     color: transparent;
     filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
     position: relative;
@@ -150,8 +145,21 @@
     position: absolute;
     left: 0;
     top: 0;
+    z-index: -2;
+    -webkit-text-stroke: 5px black;
+}
+
+.level-author::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
     z-index: -1;
+    background: linear-gradient(180deg, #fea711 0%, #fee348 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: transparent;
 }
 
 .layout-browser-loading,
@@ -161,6 +169,8 @@
     margin-top: 2rem;
     padding: 1rem;
     color: var(--text-primary);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
 }
 
 .page-counter {
@@ -298,11 +308,11 @@
 
 .difficulty-value-label {
     padding-left: 1rem;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 800;
     font-family: var(--font-main);
     color: white;
-    -webkit-text-stroke: 3px black;
+    -webkit-text-stroke: 5px black;
     paint-order: stroke fill;
     filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
 }
@@ -361,4 +371,27 @@
     color: rgba(255, 255, 130, 0.5);
     -webkit-text-stroke: 0px rgba(0, 0, 0, 0);
     z-index: 10;
+}
+
+.time-left-container {
+    text-align: center;
+    font-size: 2rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-main);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+}
+
+.no-layouts-found {
+    text-align: center;
+    width: 100%;
+    padding: 3rem;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-main);
+    color: white;
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
 }

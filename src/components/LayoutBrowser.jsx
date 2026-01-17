@@ -128,7 +128,7 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {} }) => {
       <div className="layout-browser-container glass">
         {loading && <div className="layout-browser-overlay glass">Loading...</div>}
         {levels.length === 0 ? (
-          <div style={{ textAlign: 'center', width: '100%', padding: '3rem', fontSize: '2rem', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+          <div className="no-layouts-found">
             No Layouts Found
           </div>
         ) : (
@@ -189,7 +189,7 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {} }) => {
                     </div>
                   </div>
                   {level.totalSuggests !== undefined && (
-                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: '#ddd', marginTop: '0.2rem', marginBottom: '0.2rem', fontFamily: 'Helvetica, sans-serif', fontWeight: 'bold' }}>
+                    <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: '#fff', marginTop: '0.2rem', marginBottom: '0.2rem', fontFamily: 'Helvetica, sans-serif', fontWeight: 'bold' }}>
                       <span>Total Suggests: {level.totalSuggests}</span>
                       {level.suggestedFeatured > 0 && <span>Featured: {level.suggestedFeatured}</span>}
                       {level.suggestedEpic > 0 && <span>Epic: {level.suggestedEpic}</span>}

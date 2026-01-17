@@ -2,6 +2,9 @@
     margin-bottom: 2rem;
     overflow: hidden;
     transition: all 0.3s ease;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 2rem auto;
 }
 
 .search-filters-header {
@@ -11,6 +14,8 @@
     padding: 1rem 1.5rem;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.05);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
     border-bottom: 1px solid var(--glass-border);
 }
 
@@ -19,11 +24,12 @@
 }
 
 .search-filters-title {
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
     font-family: var(--font-main);
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: bold;
     color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -53,17 +59,20 @@
 .search-label {
     font-weight: bold;
     font-family: var(--font-main);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+    font-size: 1.2rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .search-input,
 .search-select {
-    padding: 0.75rem;
+    padding: 1rem;
     border-radius: 8px;
     border: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.4);
     font-family: var(--font-main);
-    font-size: 1rem;
+    font-size: 1.2rem;
 }
 
 .search-input::placeholder {
@@ -72,7 +81,6 @@
 
 .checkbox-group {
     display: flex;
-    gap: 1.5rem;
     flex-wrap: wrap;
     align-items: center;
 }
@@ -80,19 +88,21 @@
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
     cursor: pointer;
     font-family: var(--font-main);
     color: white;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
 }
 
 .checkbox-input {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
-    accent-color: var(--accent-primary);
+    accent-color: #1255ea;
 }
 
 .search-submit-btn {
@@ -111,7 +121,7 @@
     border-image-repeat: stretch;
     background: transparent;
 
-    -webkit-text-stroke: 4px black;
+    -webkit-text-stroke: 5px black;
     paint-order: stroke fill;
     filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
 

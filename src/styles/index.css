@@ -47,20 +47,17 @@ body {
   background-blend-mode: multiply;
   animation: bg-scroll var(--bg-scroll-duration) linear infinite;
   color: var(--text-primary);
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
   overflow-x: hidden;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  -webkit-text-stroke: 5px black;
-  paint-order: stroke fill;
 }
 
 a {
   color: var(--accent-primary);
   text-decoration: none;
   transition: color 0.3s ease;
-  -webkit-text-stroke: 5px black;
-  paint-order: stroke fill;
 }
 
 a:hover {

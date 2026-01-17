@@ -170,7 +170,7 @@ const MonthlyLevelCard = ({ level }) => {
                     VIEW
                 </a>
             </div>
-            <div style={{ textAlign: 'center', fontSize: '2rem', color: '#fff', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+            <div className="time-left-container">
                 Time Left: {formatTime(timeLeft)}
             </div>
         </div>

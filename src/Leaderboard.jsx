@@ -107,7 +107,7 @@ const Leaderboard = () => {
                         {users.map((user, index) => {
                             const rank = user.rank || ((page - 1) * meta.amount + index + 1);
                             return (
-                                <div key={user.accountId || index} className="user-card glass">
+                                <div key={user.accountId || index} className="user-card">
                                     <div className={`user-rank rank-${rank}`}>{rank}</div>
                                     <div className="user-info">
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

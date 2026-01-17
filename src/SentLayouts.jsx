@@ -36,15 +36,6 @@ function SentLayouts() {
                             className="sent-input-field"
                         />
                     </div>
-                    <div className="sent-input-group">
-                        <label className="sent-input-label">Account ID</label>
-                        <input
-                            type="text"
-                            value={accountId}
-                            onChange={(e) => setAccountId(e.target.value)}
-                            className="sent-input-field"
-                        />
-                    </div>
                 </div>
                 <button
                     onClick={handleSearch}
