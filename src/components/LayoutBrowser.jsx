@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import '../styles/LayoutBrowser.css';
 
-const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {} }) => {
+const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = false }) => {
   const [levels, setLevels] = useState([]);
   const [meta, setMeta] = useState({ totalAmount: 0, page: 1, amount: 10 });
   const [page, setPage] = useState(1);
@@ -119,12 +119,13 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {} }) => {
 
   return (
     <>
-      <div className="page-counter glass">
-        <span className="page-text">
-          {displayFirst} to {displayLast} of {meta.totalAmount}
-        </span>
-
-      </div>
+      {!hidePagination && (
+        <div className="page-counter glass">
+          <span className="page-text">
+            {displayFirst} to {displayLast} of {meta.totalAmount}
+          </span>
+        </div>
+      )}
       <div className="layout-browser-container glass">
         {loading && <div className="layout-browser-overlay glass">Loading...</div>}
         {levels.length === 0 ? (
@@ -220,23 +221,25 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {} }) => {
           }))}
       </div>
 
-      <div className="pagination-bottom">
-        <button
-          onClick={handlePrevPage}
-          disabled={page <= 1}
-          className="nav-btn-glass glass"
-        >
-          <ChevronLeft size={32} />
-        </button>
+      {!hidePagination && (
+        <div className="pagination-bottom">
+          <button
+            onClick={handlePrevPage}
+            disabled={page <= 1}
+            className="nav-btn-glass glass"
+          >
+            <ChevronLeft size={32} />
+          </button>
 
-        <button
-          onClick={handleNextPage}
-          disabled={page >= Math.ceil(meta.totalAmount / meta.amount)}
-          className="nav-btn-glass glass"
-        >
-          <ChevronRight size={32} />
-        </button>
-      </div>
+          <button
+            onClick={handleNextPage}
+            disabled={page >= Math.ceil(meta.totalAmount / meta.amount)}
+            className="nav-btn-glass glass"
+          >
+            <ChevronRight size={32} />
+          </button>
+        </div>
+      )}
     </>
   );
 

@@ -1,0 +1,257 @@
+.profile-search-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 2rem auto;
+    overflow: hidden;
+}
+
+.profile-search-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    font-family: var(--font-main);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+}
+
+.profile-search-content {
+    padding: 1.5rem;
+}
+
+.profile-search-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.profile-search-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 200px;
+}
+
+.profile-search-field.flex-grow {
+    flex: 1;
+}
+
+.profile-label {
+    font-weight: bold;
+    font-family: var(--font-main);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.profile-input,
+.profile-select {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.4);
+    font-family: var(--font-main);
+    font-size: 2rem;
+    color: white;
+    width: 100%;
+}
+
+.profile-input:focus,
+.profile-select:focus {
+    outline: 2px solid var(--accent-primary);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.profile-submit-btn {
+    padding: 0.75rem 2rem;
+    color: white;
+    font-weight: 800;
+    font-family: var(--font-main);
+    cursor: pointer;
+    font-size: 1.5rem;
+
+    border: 15px solid transparent;
+    border-image-source: url('/RL_blank01.png');
+    border-image-slice: 400 fill;
+    border-image-width: 10px;
+    border-image-repeat: stretch;
+    background: transparent;
+
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+
+    transition: transform 0.2s ease, filter 0.2s ease;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-submit-btn:hover:not(:disabled) {
+    transform: scale(1.05);
+    filter: drop-shadow(5px 5px 0px rgba(0, 0, 0, 0.5)) brightness(1.2);
+}
+
+.profile-submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.profile-error {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+    color: #ff6b6b;
+    font-size: 1.5rem;
+    font-weight: bold;
+    -webkit-text-stroke: 3px black;
+    paint-order: stroke fill;
+}
+
+.profile-results {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.profile-header h2 {
+    font-size: 3rem;
+    font-family: var(--font-main);
+    -webkit-text-stroke: 5px black;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+    paint-order: stroke fill;
+    color: white;
+}
+
+.account-id {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+}
+
+.profile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid var(--glass-border);
+}
+
+.stat-label {
+    display: block;
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: var(--font-main);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+    color: white;
+}
+
+.raw-data {
+    margin-top: 2rem;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.raw-data summary {
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--accent-primary);
+}
+
+.search-toggles {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 1rem;
+
+    color: var(--text-secondary);
+    font-family: var(--font-main);
+    cursor: pointer;
+    font-size: 1.5rem;
+
+    border: 15px solid transparent;
+    border-image-source: url('/RL_blank01.png');
+    border-image-slice: 400 fill;
+    border-image-width: 10px;
+    border-image-repeat: stretch;
+    background: transparent;
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.search-toggle-btn.active {
+    color: white;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5)) brightness(1.4);
+    transform: scale(1.05);
+}
+
+.search-toggle-btn:hover:not(.active) {
+    transform: scale(1.05);
+    filter: drop-shadow(5px 5px 0px rgba(0, 0, 0, 0.5)) brightness(1.1);
+}
+
+.profile-input {
+    height: 60px;
+}
+
+.user-badge {
+    height: 2.5em;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.5));
+    transition: transform 0.2s ease;
+}
+
+.user-badge:hover {
+    transform: scale(1.2);
+}

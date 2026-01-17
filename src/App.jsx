@@ -11,6 +11,7 @@ import PageLayout from './components/PageLayout';
 import { Analytics } from "@vercel/analytics/react";
 import SentLayouts from './SentLayouts';
 import Search from './Search';
+import Profile from './Profile';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/daily" element={<Daily />} />
             <Route path="/weekly" element={<Weekly />} />
             <Route path="/monthly" element={<Monthly />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>
       </Router>

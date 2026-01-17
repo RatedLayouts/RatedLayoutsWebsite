@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { User } from 'lucide-react';
 import './styles/Home.css';
 
 function Home() {
@@ -45,6 +46,13 @@ function Home() {
           <p>💫 Rated Layouts Assets created by <b>Dasshu & Darkore</b></p>
           <p>🧊 Original Assets and Images by <b>RobTop Games</b></p>
         </div>
+        <button
+          className="profile-float-btn glass"
+          onClick={() => handleNavigation('/profile')}
+          title="User Profile"
+        >
+          <User size={40} className="profile-icon" />
+        </button>
       </div>
     </div>
   );
