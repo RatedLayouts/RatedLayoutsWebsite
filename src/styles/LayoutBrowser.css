@@ -42,7 +42,7 @@
     border-image-slice: 400 fill;
     border-image-width: 15px;
     border-image-repeat: stretch;
-    filter: saturate(0.0);
+    filter: hue-rotate(200deg) saturate(0.2);
     pointer-events: none;
 }
 

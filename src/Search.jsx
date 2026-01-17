@@ -77,121 +77,123 @@ const Search = () => {
                     {isOpen ? <ChevronUp size={24} color="white" /> : <ChevronDown size={24} color="white" />}
                 </div>
 
-                {isOpen && (
+                <div className={`search-filters-collapsible ${isOpen ? 'open' : ''}`}>
                     <div className="search-filters-content">
-                        {/* Row 1: Query, Username, Type */}
-                        <div className="search-row">
-                            <div className="search-field">
-                                <label className="search-label">Keywords</label>
-                                <input
-                                    type="text"
-                                    name="query"
-                                    value={formData.query}
-                                    onChange={handleInputChange}
-                                    placeholder="Level Name or ID..."
-                                    className="search-input"
-                                />
+                        <div className="search-filters-inner">
+                            {/* Row 1: Query, Username, Type */}
+                            <div className="search-row">
+                                <div className="search-field">
+                                    <label className="search-label">Keywords</label>
+                                    <input
+                                        type="text"
+                                        name="query"
+                                        value={formData.query}
+                                        onChange={handleInputChange}
+                                        placeholder="Level Name or ID..."
+                                        className="search-input"
+                                    />
+                                </div>
+                                <div className="search-field">
+                                    <label className="search-label">Username</label>
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        value={formData.username}
+                                        onChange={handleInputChange}
+                                        placeholder="Creator..."
+                                        className="search-input"
+                                    />
+                                </div>
+                                <div className="search-field">
+                                    <label className="search-label">Type</label>
+                                    <select
+                                        name="type"
+                                        value={formData.type}
+                                        onChange={handleInputChange}
+                                        className="search-select"
+                                    >
+                                        <option value="any">Any</option>
+                                        <option value="classic">Classic</option>
+                                        <option value="platformer">Platformer</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div className="search-field">
-                                <label className="search-label">Username</label>
-                                <input
-                                    type="text"
-                                    name="username"
-                                    value={formData.username}
-                                    onChange={handleInputChange}
-                                    placeholder="Creator..."
-                                    className="search-input"
-                                />
+
+                            {/* Row 2: Difficulty, Checkboxes */}
+                            <div className="search-row" style={{ alignItems: 'center' }}>
+                                <div className="search-field" style={{ maxWidth: '200px' }}>
+                                    <label className="search-label">Difficulty</label>
+                                    <select
+                                        name="difficulty"
+                                        value={formData.difficulty}
+                                        onChange={handleInputChange}
+                                        className="search-select"
+                                    >
+                                        <option value="0">Any</option>
+                                        <option value="1">Auto</option>
+                                        <option value="2">Easy</option>
+                                        <option value="3">Normal</option>
+                                        <option value="4">Hard</option>
+                                        <option value="6">Harder</option>
+                                        <option value="8">Insane</option>
+                                        <option value="10">Easy Demon</option>
+                                        <option value="15">Medium Demon</option>
+                                        <option value="20">Hard Demon</option>
+                                        <option value="25">Insane Demon</option>
+                                        <option value="30">Extreme Demon</option>
+                                    </select>
+                                </div>
+
+                                <div className="checkbox-group" style={{ flex: 1, justifyContent: 'space-around' }}>
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="award"
+                                            checked={formData.award}
+                                            onChange={handleInputChange}
+                                            className="checkbox-input"
+                                        />
+                                        Rated
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="featured"
+                                            checked={formData.featured}
+                                            onChange={handleInputChange}
+                                            className="checkbox-input"
+                                        />
+                                        Featured
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="epic"
+                                            checked={formData.epic}
+                                            onChange={handleInputChange}
+                                            className="checkbox-input"
+                                        />
+                                        Epic
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="oldest"
+                                            checked={formData.oldest}
+                                            onChange={handleInputChange}
+                                            className="checkbox-input"
+                                        />
+                                        Oldest First
+                                    </label>
+                                </div>
                             </div>
-                            <div className="search-field">
-                                <label className="search-label">Type</label>
-                                <select
-                                    name="type"
-                                    value={formData.type}
-                                    onChange={handleInputChange}
-                                    className="search-select"
-                                >
-                                    <option value="any">Any</option>
-                                    <option value="classic">Classic</option>
-                                    <option value="platformer">Platformer</option>
-                                </select>
-                            </div>
+
+                            <button className="search-submit-btn" onClick={handleSearch}>
+                                SEARCH
+                            </button>
                         </div>
-
-                        {/* Row 2: Difficulty, Checkboxes */}
-                        <div className="search-row" style={{ alignItems: 'center' }}>
-                            <div className="search-field" style={{ maxWidth: '200px' }}>
-                                <label className="search-label">Difficulty</label>
-                                <select
-                                    name="difficulty"
-                                    value={formData.difficulty}
-                                    onChange={handleInputChange}
-                                    className="search-select"
-                                >
-                                    <option value="0">Any</option>
-                                    <option value="1">Auto</option>
-                                    <option value="2">Easy</option>
-                                    <option value="3">Normal</option>
-                                    <option value="4">Hard</option>
-                                    <option value="6">Harder</option>
-                                    <option value="8">Insane</option>
-                                    <option value="10">Easy Demon</option>
-                                    <option value="15">Medium Demon</option>
-                                    <option value="20">Hard Demon</option>
-                                    <option value="25">Insane Demon</option>
-                                    <option value="30">Extreme Demon</option>
-                                </select>
-                            </div>
-
-                            <div className="checkbox-group" style={{ flex: 1, justifyContent: 'space-around' }}>
-                                <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        name="award"
-                                        checked={formData.award}
-                                        onChange={handleInputChange}
-                                        className="checkbox-input"
-                                    />
-                                    Rated
-                                </label>
-                                <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        name="featured"
-                                        checked={formData.featured}
-                                        onChange={handleInputChange}
-                                        className="checkbox-input"
-                                    />
-                                    Featured
-                                </label>
-                                <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        name="epic"
-                                        checked={formData.epic}
-                                        onChange={handleInputChange}
-                                        className="checkbox-input"
-                                    />
-                                    Epic
-                                </label>
-                                <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        name="oldest"
-                                        checked={formData.oldest}
-                                        onChange={handleInputChange}
-                                        className="checkbox-input"
-                                    />
-                                    Oldest First
-                                </label>
-                            </div>
-                        </div>
-
-                        <button className="search-submit-btn" onClick={handleSearch}>
-                            SEARCH
-                        </button>
                     </div>
-                )}
+                </div>
             </div>
 
             {fetchConfig && (
