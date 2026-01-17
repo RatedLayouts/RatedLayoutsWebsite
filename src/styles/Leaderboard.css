@@ -171,6 +171,8 @@
     margin-top: 2rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     font-family: var(--font-main);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
 }
 
 .leaderboard-error {
