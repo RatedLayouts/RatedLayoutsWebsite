@@ -26,9 +26,8 @@
 
 .profile-search-row {
     display: flex;
+    flex-direction: column;
     gap: 1.5rem;
-    flex-wrap: wrap;
-    align-items: flex-end;
 }
 
 .profile-search-field {
@@ -36,6 +35,7 @@
     flex-direction: column;
     gap: 0.5rem;
     min-width: 200px;
+    width: 100%;
 }
 
 .profile-search-field.flex-grow {
@@ -70,12 +70,12 @@
 }
 
 .profile-submit-btn {
-    padding: 0.75rem 2rem;
+    padding: 0.75rem 1rem;
     color: white;
     font-weight: 800;
     font-family: var(--font-main);
     cursor: pointer;
-    font-size: 1.5rem;
+    font-size: clamp(1rem, 5vw, 1.5rem);
 
     border: 15px solid transparent;
     border-image-source: url('/RL_blank01.png');
@@ -93,10 +93,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
 }
 
 .profile-submit-btn:hover:not(:disabled) {
-    transform: scale(1.05);
+    transform: scale(1.02);
     filter: drop-shadow(5px 5px 0px rgba(0, 0, 0, 0.5)) brightness(1.2);
 }
 
@@ -203,19 +204,21 @@
     display: flex;
     gap: 1rem;
     align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 .search-toggle-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.2rem 1rem;
+    justify-content: center;
+    gap: 1rem;
+    flex: 1;
 
     color: var(--text-secondary);
     font-family: var(--font-main);
     cursor: pointer;
     font-size: 1.5rem;
-
     border: 15px solid transparent;
     border-image-source: url('/RL_blank01.png');
     border-image-slice: 400 fill;
@@ -227,6 +230,7 @@
     filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
 
     transition: transform 0.2s ease, filter 0.2s ease;
+    white-space: nowrap;
 }
 
 .search-toggle-btn.active {

@@ -99,8 +99,8 @@
   position: fixed;
   bottom: 2rem;
   left: 2rem;
-  width: 100px;
-  height: 100px;
+  width: clamp(30px, 15vw, 80px);
+  height: clamp(30px, 15vw, 80px);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -110,10 +110,10 @@
   z-index: 100;
   filter: drop-shadow(5px 5px 0px rgba(0, 0, 0, 0.5));
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
-  border: 10px solid transparent;
+  border: 15px solid transparent;
   border-image-source: url('/RL_blank01.png');
   border-image-slice: 400 fill;
-  border-image-width: 10px;
+  border-image-width: 15px;
   border-image-repeat: stretch;
 }
 
@@ -128,8 +128,8 @@
 
 .profile-icon {
   color: white;
-  width: 60px;
-  height: 60px;
+  width: 60%;
+  height: 60%;
   stroke-width: 2.5;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }

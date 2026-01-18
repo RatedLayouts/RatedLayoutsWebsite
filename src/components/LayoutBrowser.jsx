@@ -2,12 +2,18 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import '../styles/LayoutBrowser.css';
 
-const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = false }) => {
+const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = false, onMetaChange }) => {
   const [levels, setLevels] = useState([]);
   const [meta, setMeta] = useState({ totalAmount: 0, page: 1, amount: 10 });
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (onMetaChange) {
+      onMetaChange(meta);
+    }
+  }, [meta, onMetaChange]);
 
   useEffect(() => {
     if (layouts) {

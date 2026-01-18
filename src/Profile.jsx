@@ -11,6 +11,8 @@ const Profile = () => {
     const [error, setError] = useState(null);
     const [layoutsFetchUrl, setLayoutsFetchUrl] = useState(null);
     const [ratedLayoutsFetchConfig, setRatedLayoutsFetchConfig] = useState(null);
+    const [ratedLayoutsCount, setRatedLayoutsCount] = useState(0);
+    const [sentLayoutsCount, setSentLayoutsCount] = useState(0);
 
     const handleSearch = async () => {
         if (!searchValue.trim()) return;
@@ -20,6 +22,8 @@ const Profile = () => {
         setProfileData(null);
         setLayoutsFetchUrl(null);
         setRatedLayoutsFetchConfig(null);
+        setRatedLayoutsCount(0);
+        setSentLayoutsCount(0);
 
         try {
             const queryParam = searchMethod === 'username' ? 'username' : 'accountId';
@@ -59,7 +63,8 @@ const Profile = () => {
                         epic: 0,
                         oldest: 0,
                         query: '',
-                        difficulty: 0
+                        difficulty: 0,
+                        amount: 100
                     })
                 }
             });
@@ -188,13 +193,14 @@ const Profile = () => {
                     {ratedLayoutsFetchConfig && (
                         <div style={{ marginTop: '2rem', width: '100%', maxWidth: '1200px' }}>
                             <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '1rem', textShadow: '0 2px 4px rgba(0,0,0,0.5)', WebkitTextStroke: '5px black', paintOrder: 'stroke fill' }}>
-                                Rated Layouts
+                                Rated Layouts ({ratedLayoutsCount})
                             </h2>
                             <LayoutBrowser
                                 key={`rated-${JSON.stringify(ratedLayoutsFetchConfig)}`}
                                 fetchUrl={ratedLayoutsFetchConfig.url}
                                 fetchOptions={ratedLayoutsFetchConfig.options}
                                 hidePagination={true}
+                                onMetaChange={(meta) => setRatedLayoutsCount(meta.totalAmount)}
                             />
                         </div>
                     )}
@@ -202,9 +208,14 @@ const Profile = () => {
                     {layoutsFetchUrl && (
                         <div style={{ marginTop: '2rem', width: '100%', maxWidth: '1200px' }}>
                             <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '1rem', textShadow: '0 2px 4px rgba(0,0,0,0.5)', WebkitTextStroke: '5px black', paintOrder: 'stroke fill' }}>
-                                Sent Layouts
+                                Sent Layouts ({sentLayoutsCount})
                             </h2>
-                            <LayoutBrowser key={layoutsFetchUrl} fetchUrl={layoutsFetchUrl} hidePagination={true} />
+                            <LayoutBrowser
+                                key={layoutsFetchUrl}
+                                fetchUrl={layoutsFetchUrl}
+                                hidePagination={true}
+                                onMetaChange={(meta) => setSentLayoutsCount(meta.totalAmount)}
+                            />
                         </div>
                     )}
                 </>
