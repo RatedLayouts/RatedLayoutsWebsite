@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GDClient } from 'gavatar';
-import GDIcon from './components/GDIcon';
-
-
 import { User, Search as SearchIcon, IdCard } from 'lucide-react';
+import GDIcon from './components/GDIcon';
 import LayoutBrowser from './components/LayoutBrowser';
 import './styles/Profile.css';
 
@@ -26,11 +24,11 @@ const Profile = () => {
         setAvatarData(null);
 
         const loadAvatar = async () => {
-            const username = profileData?.username || searchValue;
-            if (!username) return;
+            const identifier = profileData?.accountId || profileData?.username || searchValue;
+            if (!identifier) return;
 
             try {
-                const avatar = await client.getAvatar(username, 'cube');
+                const avatar = await client.getAvatar(identifier, 'cube');
                 if (isMounted) {
                     setAvatarData(avatar);
                 }
@@ -42,7 +40,7 @@ const Profile = () => {
         loadAvatar();
 
         return () => { isMounted = false; };
-    }, [profileData?.username]);
+    }, [profileData?.username, profileData?.accountId]);
 
     const handleSearch = async () => {
         if (!searchValue.trim()) return;
@@ -185,6 +183,7 @@ const Profile = () => {
                                         glow={avatarData.glow}
                                         size={80}
                                         className="profile-avatar"
+                                        assetsPath="/assets"
                                     />
                                 )}
                                 {profileData.accountId === 7689052 ? (

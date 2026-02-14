@@ -15,6 +15,11 @@ export default defineConfig({
         target: 'http://www.boomlings.com/database',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/gd-api/, ''),
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, _req, _res) => {
+            proxyReq.setHeader('User-Agent', '');
+          });
+        },
       },
     },
   },
