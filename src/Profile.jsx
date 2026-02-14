@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
-import { getAvatar } from 'gavatar';
+import { GDClient } from 'gavatar';
 import GDIcon from './components/GDIcon';
+
+
 import { User, Search as SearchIcon, IdCard } from 'lucide-react';
 import LayoutBrowser from './components/LayoutBrowser';
 import './styles/Profile.css';
+
+const client = new GDClient({ endpoint: '/gd-api' });
 
 const Profile = () => {
     const [searchMethod, setSearchMethod] = useState('username'); // 'username' or 'accountId'
@@ -26,7 +30,7 @@ const Profile = () => {
             if (!username) return;
 
             try {
-                const avatar = await getAvatar(username, 'cube');
+                const avatar = await client.getAvatar(username, 'cube');
                 if (isMounted) {
                     setAvatarData(avatar);
                 }

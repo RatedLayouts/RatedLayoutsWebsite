@@ -11,6 +11,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/gd-api': {
+        target: 'http://www.boomlings.com/database',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/gd-api/, ''),
+      },
     },
   },
 })
