@@ -140,6 +140,13 @@
     color: white;
 }
 
+.profile-avatar {
+    height: 80px;
+    width: 80px;
+    object-fit: contain;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+}
+
 .account-id {
     display: block;
     margin-top: 0.5rem;

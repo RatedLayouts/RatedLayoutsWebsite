@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getAvatar } from 'gavatar';
+import GDIcon from './components/GDIcon';
 import { User, Search as SearchIcon, IdCard } from 'lucide-react';
 import LayoutBrowser from './components/LayoutBrowser';
 import './styles/Profile.css';
@@ -13,6 +15,30 @@ const Profile = () => {
     const [ratedLayoutsFetchConfig, setRatedLayoutsFetchConfig] = useState(null);
     const [ratedLayoutsCount, setRatedLayoutsCount] = useState(0);
     const [sentLayoutsCount, setSentLayoutsCount] = useState(0);
+    const [avatarData, setAvatarData] = useState(null);
+
+    useEffect(() => {
+        let isMounted = true;
+        setAvatarData(null);
+
+        const loadAvatar = async () => {
+            const username = profileData?.username || searchValue;
+            if (!username) return;
+
+            try {
+                const avatar = await getAvatar(username, 'cube');
+                if (isMounted) {
+                    setAvatarData(avatar);
+                }
+            } catch (err) {
+                console.error("Failed to fetch avatar:", err);
+            }
+        };
+
+        loadAvatar();
+
+        return () => { isMounted = false; };
+    }, [profileData?.username]);
 
     const handleSearch = async () => {
         if (!searchValue.trim()) return;
@@ -146,7 +172,17 @@ const Profile = () => {
                     <div className="glass profile-results">
                         <div className="profile-header">
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
-                                <h2>{profileData.username || searchValue}</h2>
+                                {avatarData && (
+                                    <GDIcon
+                                        form="cube"
+                                        iconID={avatarData.iconID}
+                                        col1={avatarData.col1}
+                                        col2={avatarData.col2}
+                                        glow={avatarData.glow}
+                                        size={80}
+                                        className="profile-avatar"
+                                    />
+                                )}
                                 {profileData.accountId === 7689052 ? (
                                     <img src="/RL_badgeOwner.png" alt="Rated Layouts Owner" className="user-badge" title="Rated Layouts Owner" />
                                 ) : (
@@ -162,6 +198,7 @@ const Profile = () => {
                                         )}
                                     </>
                                 )}
+                                <h2>{profileData.username || searchValue}</h2>
                             </div>
                             {(profileData.accountId || searchMethod === 'accountId') && (
                                 <span className="account-id">

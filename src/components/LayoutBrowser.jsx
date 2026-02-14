@@ -111,6 +111,7 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = 
   const getFeaturedCoinAsset = (featured) => {
     if (featured === 1) return '/RL_featuredCoin.png';
     if (featured === 2) return '/RL_epicFeaturedCoin.png';
+    if (featured === 3) return '/RL_legendaryFeaturedCoin.png';
     return null;
   };
 
@@ -252,6 +253,7 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = 
   function getFeaturedCoin(featured) {
     if (featured === 1) return '/RL_featuredCoin.png';
     if (featured === 2) return '/RL_epicFeaturedCoin.png';
+    if (featured === 3) return '/RL_legendaryFeaturedCoin.png';
     return null;
   }
 
