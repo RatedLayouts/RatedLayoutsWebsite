@@ -112,6 +112,7 @@ const Profile = () => {
                         award: 0,
                         featured: 0,
                         epic: 0,
+                        legendary: 0,
                         oldest: 0,
                         query: '',
                         difficulty: 0,

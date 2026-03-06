@@ -164,7 +164,7 @@ const Level = () => {
                                 {levelData.featuredScore !== undefined && (
                                     <div className="stat-card">
                                         <span className="stat-label">Featured Score</span>
-                                        <span className="stat-value">{levelData.featuredScore}</span>
+                                        <span className="stat-value" style={{ color: '#ffde74ff' }}>{levelData.featuredScore}</span>
                                     </div>
                                 )}
                                 <div className="stat-card">
@@ -188,15 +188,19 @@ const Level = () => {
                                         <span className="stat-value">{sendStats.suggestedTotal || 0}</span>
                                     </div>
                                     <div className="stat-card">
-                                        <span className="stat-label">Epic Sends</span>
+                                        <span className="stat-label" style={{ color: '#ffc400ff' }}>Featured Sends</span>
+                                        <span className="stat-value">{sendStats.suggestedFeatured || 0}</span>
+                                    </div>
+                                    <div className="stat-card">
+                                        <span className="stat-label" style={{ color: '#80effdff' }}>Epic Sends</span>
                                         <span className="stat-value">{sendStats.suggestedEpic || 0}</span>
                                     </div>
                                     <div className="stat-card">
-                                        <span className="stat-label">Legendary Sends</span>
+                                        <span className="stat-label" style={{ color: '#ff90ff' }}>Legendary Sends</span>
                                         <span className="stat-value">{sendStats.suggestedLegendary || 0}</span>
                                     </div>
                                     <div className="stat-card">
-                                        <span className="stat-label">Rejections</span>
+                                        <span className="stat-label" style={{ color: '#ff6b6b' }}>Rejections</span>
                                         <span className="stat-value" style={{ color: sendStats.rejectedTotal > 0 ? '#ff6b6b' : 'inherit' }}>
                                             {sendStats.rejectedTotal || 0}
                                         </span>
@@ -241,8 +245,9 @@ const Level = () => {
                         </a>
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 

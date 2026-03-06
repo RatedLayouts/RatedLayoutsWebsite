@@ -13,6 +13,7 @@ const Search = () => {
         award: false,
         featured: false,
         epic: false,
+        legendary: false,
         oldest: false,
         username: '',
         query: '',
@@ -33,6 +34,7 @@ const Search = () => {
             award: formData.award ? 1 : 0,
             featured: formData.featured ? 1 : 0,
             epic: formData.epic ? 1 : 0,
+            legendary: formData.legendary ? 1 : 0,
             oldest: formData.oldest ? 1 : 0,
             username: formData.username,
             query: formData.query
@@ -174,6 +176,16 @@ const Search = () => {
                                             className="checkbox-input"
                                         />
                                         Epic
+                                    </label>
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="legendary"
+                                            checked={formData.legendary}
+                                            onChange={handleInputChange}
+                                            className="checkbox-input"
+                                        />
+                                        Legendary
                                     </label>
                                     <label className="checkbox-label">
                                         <input
