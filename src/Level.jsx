@@ -224,7 +224,7 @@ const Level = () => {
                                 </div>
                                 <div className="stat-card">
                                     <span className="stat-label">Avg Difficulty</span>
-                                    <span className="stat-value">{voteStats.averageDifficulty || 0}</span>
+                                    <span className="stat-value">{voteStats.difficultyScore?.toFixed(2) || '0.00'}/30</span>
                                 </div>
                             </div>
                         </div>
