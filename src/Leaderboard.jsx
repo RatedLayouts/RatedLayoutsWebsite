@@ -125,11 +125,23 @@ const Leaderboard = () => {
                                                     {user.isSupporter && (
                                                         <img src="/RL_badgeSupporter.png" alt="Layout Supporter" className="user-badge" title="Layout Supporter" />
                                                     )}
-                                                    {user.modRole === 2 && (
-                                                        <img src="/RL_badgeAdmin01.png" alt="Layout Admin" className="user-badge" title="Layout Admin" />
+                                                    {user.isBooster && (
+                                                        <img src="/RL_badgeBooster.png" alt="Server Booster" className="user-badge" title="Server Booster" />
                                                     )}
-                                                    {user.modRole === 1 && (
-                                                        <img src="/RL_badgeMod01.png" alt="Layout Moderator" className="user-badge" title="Layout Moderator" />
+                                                    {user.isClassicAdmin && (
+                                                        <img src="/RL_badgeAdmin01.png" alt="Classic Admin" className="user-badge" title="Classic Admin" />
+                                                    )}
+                                                    {user.isClassicMod && (
+                                                        <img src="/RL_badgeMod01.png" alt="Classic Moderator" className="user-badge" title="Classic Moderator" />
+                                                    )}
+                                                    {user.isPlatAdmin && (
+                                                        <img src="/RL_badgePlatAdmin01.png" alt="Platformer Admin" className="user-badge" title="Platformer Admin" />
+                                                    )}
+                                                    {user.isPlatMod && (
+                                                        <img src="/RL_badgePlatMod01.png" alt="Platformer Moderator" className="user-badge" title="Platformer Moderator" />
+                                                    )}
+                                                    {user.isLeaderboardMod && (
+                                                        <img src="/RL_badgelbMod01.png" alt="Leaderboard Moderator" className="user-badge" title="Leaderboard Moderator" />
                                                     )}
                                                 </>
                                             )}

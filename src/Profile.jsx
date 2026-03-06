@@ -197,18 +197,6 @@ const Profile = () => {
                     <div className="glass profile-results">
                         <div className="profile-header">
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
-                                {avatarData && (
-                                    <GDIcon
-                                        form="cube"
-                                        iconID={avatarData.iconID}
-                                        col1={avatarData.col1}
-                                        col2={avatarData.col2}
-                                        glow={avatarData.glow}
-                                        size={80}
-                                        className="profile-avatar"
-                                        assetsPath="/assets"
-                                    />
-                                )}
                                 {profileData.accountId === 7689052 ? (
                                     <img src="/RL_badgeOwner.png" alt="Rated Layouts Owner" className="user-badge" title="Rated Layouts Owner" />
                                 ) : (
@@ -216,11 +204,23 @@ const Profile = () => {
                                         {profileData.isSupporter && (
                                             <img src="/RL_badgeSupporter.png" alt="Layout Supporter" className="user-badge" title="Layout Supporter" />
                                         )}
-                                        {profileData.modRole === 2 && (
-                                            <img src="/RL_badgeAdmin01.png" alt="Layout Admin" className="user-badge" title="Layout Admin" />
+                                        {profileData.isBooster && (
+                                            <img src="/RL_badgeBooster.png" alt="Server Booster" className="user-badge" title="Server Booster" />
                                         )}
-                                        {profileData.modRole === 1 && (
-                                            <img src="/RL_badgeMod01.png" alt="Layout Moderator" className="user-badge" title="Layout Moderator" />
+                                        {profileData.isClassicAdmin && (
+                                            <img src="/RL_badgeAdmin01.png" alt="Classic Admin" className="user-badge" title="Classic Admin" />
+                                        )}
+                                        {profileData.isClassicMod && (
+                                            <img src="/RL_badgeMod01.png" alt="Classic Moderator" className="user-badge" title="Classic Moderator" />
+                                        )}
+                                        {profileData.isPlatAdmin && (
+                                            <img src="/RL_badgePlatAdmin01.png" alt="Platformer Admin" className="user-badge" title="Platformer Admin" />
+                                        )}
+                                        {profileData.isPlatMod && (
+                                            <img src="/RL_badgePlatMod01.png" alt="Platformer Moderator" className="user-badge" title="Platformer Moderator" />
+                                        )}
+                                        {profileData.isLeaderboardMod && (
+                                            <img src="/RL_badgelbMod01.png" alt="Leaderboard Moderator" className="user-badge" title="Leaderboard Moderator" />
                                         )}
                                     </>
                                 )}

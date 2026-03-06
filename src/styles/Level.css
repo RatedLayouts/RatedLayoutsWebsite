@@ -1,16 +1,17 @@
 .level-details-card {
     padding: 2rem;
     border-radius: 12px;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     text-align: center;
 }
 
 .level-main-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 1.5rem;
+    justify-content: center;
+    gap: 3rem;
     margin-bottom: 2rem;
 }
 
@@ -57,7 +58,10 @@
 }
 
 .level-header-huge {
-    text-align: center;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .loading-level,
@@ -74,16 +78,17 @@
 .level-name-huge {
     font-size: 3.5rem;
     font-weight: 900;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
     -webkit-text-fill-color: transparent;
     color: transparent;
     filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.5));
     position: relative;
     z-index: 1;
     text-decoration: none;
-    display: inline-block;
+    display: block;
     font-family: var(--font-main);
     letter-spacing: 2px;
+    width: fit-content;
 }
 
 .level-name-huge::before {
@@ -157,8 +162,79 @@
 .level-stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 1.5rem;
     margin-bottom: 2rem;
+    width: 100%;
+}
+
+.level-stats-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.5));
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    font-family: var(--font-main);
+    letter-spacing: 2px;
+}
+
+.level-stats-title::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -2;
+    -webkit-text-stroke: 6px black;
+}
+
+.level-stats-title::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    background: #ffffff;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.stat-card {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.stat-label {
+    display: block;
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+    filter: drop-shadow(3px 3px 0px rgba(0, 0, 0, 0.5));
+    font-weight: bold;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: var(--font-main);
+    -webkit-text-stroke: 5px black;
+    paint-order: stroke fill;
+    color: white;
 }
 
 .level-actions {

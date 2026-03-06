@@ -6,6 +6,7 @@ import './styles/Level.css';
 const Level = () => {
     const { levelIdOrName } = useParams();
     const [levelData, setLevelData] = useState(null);
+    const [sendStats, setSendStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -35,6 +36,16 @@ const Level = () => {
 
                 const data = await response.json();
                 setLevelData(data);
+
+                try {
+                    const sendsResponse = await fetch(`/v1/getLevelSends?levelId=${data.levelId}`);
+                    if (sendsResponse.ok) {
+                        const sendsData = await sendsResponse.json();
+                        setSendStats(sendsData);
+                    }
+                } catch (sendsErr) {
+                    console.error("Error fetching send stats:", sendsErr);
+                }
             } catch (err) {
                 console.error("Error fetching level:", err);
                 setError(err.message);
@@ -82,9 +93,6 @@ const Level = () => {
 
     return (
         <div className="container">
-            <h1 className="page-title">
-                Level Details
-            </h1>
 
             {loading && <div className="loading-level glass" style={{ textAlign: 'center' }}>Loading level details...</div>}
 
@@ -126,30 +134,61 @@ const Level = () => {
                         </div>
                     </div>
 
-                    <div className="level-stats-grid">
-                        <div className="stat-card">
-                            <span className="stat-label">Level ID</span>
-                            <span className="stat-value">{levelData.levelId}</span>
+                    <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <div style={{ flex: '1', minWidth: '400px' }}>
+                            <h3 className="level-stats-title" data-text="LEVEL INFO">LEVEL INFO</h3>
+                            <div className="level-stats-grid" style={{ marginBottom: 0 }}>
+                                <div className="stat-card">
+                                    <span className="stat-label">Level ID</span>
+                                    <span className="stat-value">{levelData.levelId}</span>
+                                </div>
+                                <div className="stat-card">
+                                    <span className="stat-label">Difficulty</span>
+                                    <span className="stat-value">{difficulty}</span>
+                                </div>
+                                {levelData.featuredScore !== undefined && (
+                                    <div className="stat-card">
+                                        <span className="stat-label">Featured Score</span>
+                                        <span className="stat-value">{levelData.featuredScore}</span>
+                                    </div>
+                                )}
+                                <div className="stat-card">
+                                    <span className="stat-label">Game Type</span>
+                                    <span className="stat-value" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                        {getTypeIcon(levelData.type) && (
+                                            <img src={getTypeIcon(levelData.type)} alt={levelData.type} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+                                        )}
+                                        {levelData.type}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="stat-card">
-                            <span className="stat-label">Difficulty</span>
-                            <span className="stat-value">{difficulty}</span>
-                        </div>
-                        {levelData.featuredScore !== undefined && (
-                            <div className="stat-card">
-                                <span className="stat-label">Featured Score</span>
-                                <span className="stat-value">{levelData.featuredScore}</span>
+
+                        {sendStats && (
+                            <div style={{ flex: '1', minWidth: '400px' }}>
+                                <h3 className="level-stats-title" data-text="SEND STATS">SEND STATS</h3>
+                                <div className="level-stats-grid" style={{ marginBottom: 0 }}>
+                                    <div className="stat-card">
+                                        <span className="stat-label">Total Sends</span>
+                                        <span className="stat-value">{sendStats.suggestedTotal || 0}</span>
+                                    </div>
+                                    <div className="stat-card">
+                                        <span className="stat-label">Epic Sends</span>
+                                        <span className="stat-value">{sendStats.suggestedEpic || 0}</span>
+                                    </div>
+                                    <div className="stat-card">
+                                        <span className="stat-label">Legendary Sends</span>
+                                        <span className="stat-value">{sendStats.suggestedLegendary || 0}</span>
+                                    </div>
+                                    <div className="stat-card">
+                                        <span className="stat-label">Rejections</span>
+                                        <span className="stat-value" style={{ color: sendStats.rejectedTotal > 0 ? '#ff6b6b' : 'inherit' }}>
+                                            {sendStats.rejectedTotal || 0}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         )}
-                        <div className="stat-card">
-                            <span className="stat-label">Game Type</span>
-                            <span className="stat-value" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                {levelData.type}
-                                {getTypeIcon(levelData.type) && (
-                                    <img src={getTypeIcon(levelData.type)} alt={levelData.type} style={{ width: '20px', height: '20px' }} />
-                                )}
-                            </span>
-                        </div>
                     </div>
 
                     <div className="level-actions">
