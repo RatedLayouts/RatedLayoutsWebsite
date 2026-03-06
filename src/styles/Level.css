@@ -247,8 +247,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem 1rem;
-
+    padding: 0rem 1rem;
     color: white;
     font-family: var(--font-main);
     font-weight: 800;

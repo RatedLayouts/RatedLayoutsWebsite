@@ -7,6 +7,7 @@ const Level = () => {
     const { levelIdOrName } = useParams();
     const [levelData, setLevelData] = useState(null);
     const [sendStats, setSendStats] = useState(null);
+    const [voteStats, setVoteStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -45,6 +46,20 @@ const Level = () => {
                     }
                 } catch (sendsErr) {
                     console.error("Error fetching send stats:", sendsErr);
+                }
+
+                try {
+                    const votesResponse = await fetch('/v1/getVotes', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ levelId: data.levelId })
+                    });
+                    if (votesResponse.ok) {
+                        const votesData = await votesResponse.json();
+                        setVoteStats(votesData);
+                    }
+                } catch (votesErr) {
+                    console.error("Error fetching vote stats:", votesErr);
                 }
             } catch (err) {
                 console.error("Error fetching level:", err);
@@ -190,6 +205,30 @@ const Level = () => {
                             </div>
                         )}
                     </div>
+
+                    {voteStats && (
+                        <div style={{ marginBottom: '2rem' }}>
+                            <h3 className="level-stats-title" data-text="VOTE STATS">VOTE STATS</h3>
+                            <div className="level-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+                                <div className="stat-card">
+                                    <span className="stat-label">Total Votes</span>
+                                    <span className="stat-value">{voteStats.totalVotes || 0}</span>
+                                </div>
+                                <div className="stat-card">
+                                    <span className="stat-label">Avg Gameplay</span>
+                                    <span className="stat-value">{voteStats.gameplayScore?.toFixed(2) || '0.00'}/10</span>
+                                </div>
+                                <div className="stat-card">
+                                    <span className="stat-label">Avg Originality</span>
+                                    <span className="stat-value">{voteStats.originalityScore?.toFixed(2) || '0.00'}/10</span>
+                                </div>
+                                <div className="stat-card">
+                                    <span className="stat-label">Avg Difficulty</span>
+                                    <span className="stat-value">{voteStats.averageDifficulty || 0}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="level-actions">
                         <a
