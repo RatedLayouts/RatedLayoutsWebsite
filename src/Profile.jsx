@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { GDClient } from 'gavatar';
 import { User, Search as SearchIcon, IdCard } from 'lucide-react';
 import GDIcon from './components/GDIcon';
@@ -8,8 +9,11 @@ import './styles/Profile.css';
 const client = new GDClient({ endpoint: '/gd-api' });
 
 const Profile = () => {
-    const [searchMethod, setSearchMethod] = useState('username'); // 'username' or 'accountId'
-    const [searchValue, setSearchValue] = useState('');
+    const { accountId } = useParams();
+    const isNumericId = accountId ? /^\d+$/.test(accountId) : false;
+    const initialMethod = accountId ? (isNumericId ? 'accountId' : 'username') : 'username';
+    const [searchMethod, setSearchMethod] = useState(initialMethod);
+    const [searchValue, setSearchValue] = useState(accountId || '');
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -42,8 +46,19 @@ const Profile = () => {
         return () => { isMounted = false; };
     }, [profileData?.username, profileData?.accountId]);
 
-    const handleSearch = async () => {
-        if (!searchValue.trim()) return;
+    useEffect(() => {
+        if (accountId) {
+            const methodToUse = /^\d+$/.test(accountId) ? 'accountId' : 'username';
+            handleSearch(methodToUse, accountId);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [accountId]);
+
+    const handleSearch = async (overrideMethod, overrideValue) => {
+        const method = typeof overrideMethod === 'string' ? overrideMethod : searchMethod;
+        const value = overrideValue !== undefined ? overrideValue : searchValue;
+
+        if (!value || !value.toString().trim()) return;
 
         setLoading(true);
         setError(null);
@@ -54,9 +69,17 @@ const Profile = () => {
         setSentLayoutsCount(0);
 
         try {
-            const queryParam = searchMethod === 'username' ? 'username' : 'accountId';
-            const term = searchValue.trim();
-            const response = await fetch(`/v1/getProfile?${queryParam}=${encodeURIComponent(term)}`);
+            const queryParam = method === 'username' ? 'username' : 'accountId';
+            const term = value.toString().trim();
+            const response = await fetch(`/v1/getProfile`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    [queryParam]: queryParam === 'accountId' ? Number(term) : term
+                })
+            });
 
             if (!response.ok) {
                 // If 404, maybe just no profile found
@@ -224,7 +247,7 @@ const Profile = () => {
                                 <span className="stat-value">{profileData.blueCoins ?? '-'}</span>
                             </div>
                             <div className="stat-card">
-                                <span className="stat-label"><img src="/RL_blueprintPoint01.png" style={{ width: '24px', height: '24px', verticalAlign: 'middle', marginRight: '0.5rem', objectFit: 'contain' }} alt="Creator Points" />Creator Points</span>
+                                <span className="stat-label"><img src="/RL_blueprintPoint01.png" style={{ width: '24px', height: '24px', verticalAlign: 'middle', marginRight: '0.5rem', objectFit: 'contain' }} alt="Blueprint Points" />Blueprint Points</span>
                                 <span className="stat-value">{profileData.creatorPoints ?? '-'}</span>
                             </div>
                         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './styles/LayoutBrowser.css';
 
 const Monthly = () => {
@@ -120,7 +121,7 @@ const MonthlyLevelCard = ({ level }) => {
                         <img
                             src={getFeaturedCoin(level.featured)}
                             alt="Featured Coin"
-                            className={`featured-coin-bg ${level.featured === 2 ? 'epic-coin' : ''}`}
+                            className={`featured-coin-bg ${level.featured === 2 ? 'epic-coin' : ''} ${level.featured === 3 ? 'legendary-coin' : ''}`}
                         />
                     )}
                     <img
@@ -133,13 +134,9 @@ const MonthlyLevelCard = ({ level }) => {
                     <div className="level-header">
                         <div className="level-title-block">
                             <h2 className="level-name">
-                                <a
-                                    href={`https://gdbrowser.com/${level.levelId}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
+                                <Link to={`/level/${level.levelId}`}>
                                     {level.levelName}
-                                </a>
+                                </Link>
                             </h2>
                             <span className="difficulty-value-label">{level.difficulty}</span>
                             {getTypeIcon(level.type) && (
@@ -161,15 +158,13 @@ const MonthlyLevelCard = ({ level }) => {
                         by {level.creatorUsername}
                     </a>
                 </div>
-                <a
-                    href={`https://gdbrowser.com/${level.levelId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <Link
+                    to={`/level/${level.levelId}`}
                     className="view-level-button"
                     style={{ position: 'static', marginLeft: 'auto' }}
                 >
                     VIEW
-                </a>
+                </Link>
             </div>
             <div className="time-left-container">
                 Time Left: {formatTime(timeLeft)}

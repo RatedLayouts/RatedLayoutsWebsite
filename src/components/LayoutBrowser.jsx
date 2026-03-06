@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import '../styles/LayoutBrowser.css';
 
@@ -162,7 +163,7 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = 
                     <img
                       src={getFeaturedCoin(level.featured)}
                       alt="Featured Coin"
-                      className={`featured-coin-bg ${level.featured === 2 ? 'epic-coin' : ''}`}
+                      className={`featured-coin-bg ${level.featured === 2 ? 'epic-coin' : ''} ${level.featured === 3 ? 'legendary-coin' : ''}`}
                     />
                   )}
                   <img
@@ -175,13 +176,9 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = 
                   <div className="level-header">
                     <div className="level-title-block">
                       <h2 className="level-name">
-                        <a
-                          href={`https://gdbrowser.com/${level.levelId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                        <Link to={`/level/${level.levelId || encodeURIComponent(levelName)}`}>
                           {levelName}
-                        </a>
+                        </Link>
                       </h2>
                       <span className="difficulty-value-label">
                         {level.featuredScore === undefined ? "Avg Diff: " : ""}
@@ -215,14 +212,12 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = 
                     </a>
                   )}
                 </div>
-                <a
-                  href={`https://gdbrowser.com/${level.levelId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to={`/level/${level.levelId || encodeURIComponent(levelName)}`}
                   className="view-level-button"
                 >
                   VIEW
-                </a>
+                </Link>
               </div>
             )
           }))}

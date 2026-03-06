@@ -88,6 +88,11 @@
     height: 190%;
 }
 
+.legendary-coin {
+    width: 190%;
+    height: 190%;
+}
+
 .level-info {
     display: flex;
     flex-direction: column;

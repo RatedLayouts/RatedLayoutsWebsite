@@ -12,6 +12,7 @@ import { Analytics } from "@vercel/analytics/react";
 import SentLayouts from './SentLayouts';
 import Search from './Search';
 import Profile from './Profile';
+import Level from './Level';
 
 function App() {
   return (
@@ -36,6 +37,8 @@ function App() {
             <Route path="/weekly" element={<Weekly />} />
             <Route path="/monthly" element={<Monthly />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/user/:accountId" element={<Profile />} />
+            <Route path="/level/:levelIdOrName" element={<Level />} />
           </Route>
         </Routes>
       </Router>

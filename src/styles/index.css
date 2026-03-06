@@ -21,8 +21,7 @@
   --spacing-lg: 2rem;
   --spacing-xl: 4rem;
 
-  /* Animation */
-  --bg-scroll-duration: 20s;
+  /* Background */
   --bg-aspect-ratio: 1;
   --bg-height: 100vh;
   --bg-width: calc(var(--bg-height) * var(--bg-aspect-ratio));
@@ -45,7 +44,6 @@ body {
   background-position: 0 center;
   background-size: var(--bg-width) var(--bg-height);
   background-blend-mode: multiply;
-  animation: bg-scroll var(--bg-scroll-duration) linear infinite;
   color: var(--text-primary);
   height: 100vh;
   width: 100vw;
@@ -130,16 +128,6 @@ a:hover {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #333;
-}
-
-@keyframes bg-scroll {
-  from {
-    background-position: 0 center;
-  }
-
-  to {
-    background-position: calc(-1 * var(--bg-width)) center;
-  }
 }
 
 /* Mobile Blocker */

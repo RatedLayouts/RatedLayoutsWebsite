@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './styles/Leaderboard.css';
 
 const Leaderboard = () => {
@@ -63,7 +64,7 @@ const Leaderboard = () => {
     const filterTypes = [
         { id: 1, label: 'Sparks', icon: '/RL_sparkBig.png' },
         { id: 2, label: 'Planets', icon: '/RL_planetBig.png' },
-        { id: 3, label: 'Creator Points', icon: '/RL_blueprintPoint01.png' },
+        { id: 3, label: 'Blueprint Points', icon: '/RL_blueprintPoint01.png' },
         { id: 4, label: 'Coins', icon: '/RL_BlueCoin.png' }
     ];
 
@@ -111,14 +112,12 @@ const Leaderboard = () => {
                                     <div className={`user-rank rank-${rank}`}>{rank}</div>
                                     <div className="user-info">
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <a
-                                                href={`https://gdbrowser.com/u/${user.accountId}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <Link
+                                                to={`/user/${user.accountId}`}
                                                 className="user-name"
                                             >
                                                 {user.username}
-                                            </a>
+                                            </Link>
                                             {user.accountId === 7689052 ? (
                                                 <img src="/RL_badgeOwner.png" alt="Rated Layouts Owner" className="user-badge" title="Rated Layouts Owner" />
                                             ) : (
@@ -144,8 +143,8 @@ const Leaderboard = () => {
                                                 <img src="/RL_planetBig.png" alt="Planets" className="stat-icon" />
                                                 <span className="stat-value">{user.planets}</span>
                                             </div>
-                                            <div className="stat-item" title="Creator Points">
-                                                <img src="/RL_blueprintPoint01.png" alt="Creator Points" className="stat-icon" />
+                                            <div className="stat-item" title="Blueprint Points">
+                                                <img src="/RL_blueprintPoint01.png" alt="Blueprint Points" className="stat-icon" />
                                                 <span className="stat-value">{user.creatorPoints}</span>
                                             </div>
                                             <div className="stat-item" title="Blue Coins">
