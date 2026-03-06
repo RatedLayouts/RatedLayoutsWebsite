@@ -201,15 +201,13 @@ const LayoutBrowser = ({ fetchUrl, layouts, fetchOptions = {}, hidePagination = 
                     </div>
                   )}
                   {level.creatorUsername && (
-                    <a
-                      href={`https://gdbrowser.com/u/${level.creatorAccountId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <Link
+                      to={`/user/${level.creatorAccountId}`}
                       className="level-author"
                       data-text={`by ${level.creatorUsername}`}
                     >
                       by {level.creatorUsername}
-                    </a>
+                    </Link>
                   )}
                 </div>
                 <Link
