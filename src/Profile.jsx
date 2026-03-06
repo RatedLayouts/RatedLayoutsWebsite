@@ -202,26 +202,26 @@ const Profile = () => {
                                     <img src="/RL_badgeOwner.png" alt="Rated Layouts Owner" className="user-badge" title="Rated Layouts Owner" />
                                 ) : (
                                     <>
+                                        {profileData.isClassicAdmin && (
+                                            <img src="/RL_badgeAdmin01.png" alt="Classic Layout Admin" className="user-badge" title="Classic Layout Admin" />
+                                        )}
+                                        {profileData.isPlatAdmin && (
+                                            <img src="/RL_badgePlatAdmin01.png" alt="Platformer Layout Admin" className="user-badge" title="Platformer Layout Admin" />
+                                        )}
+                                        {profileData.isClassicMod && (
+                                            <img src="/RL_badgeMod01.png" alt="Classic Layout Moderator" className="user-badge" title="Classic Layout Moderator" />
+                                        )}
+                                        {profileData.isPlatMod && (
+                                            <img src="/RL_badgePlatMod01.png" alt="Platformer Layout Moderator" className="user-badge" title="Platformer Layout Moderator" />
+                                        )}
+                                        {profileData.isLeaderboardMod && (
+                                            <img src="/RL_badgelbMod01.png" alt="Leaderboard Layout Moderator" className="user-badge" title="Leaderboard Layout Moderator" />
+                                        )}
                                         {profileData.isSupporter && (
                                             <img src="/RL_badgeSupporter.png" alt="Layout Supporter" className="user-badge" title="Layout Supporter" />
                                         )}
                                         {profileData.isBooster && (
-                                            <img src="/RL_badgeBooster.png" alt="Server Booster" className="user-badge" title="Server Booster" />
-                                        )}
-                                        {profileData.isClassicAdmin && (
-                                            <img src="/RL_badgeAdmin01.png" alt="Classic Admin" className="user-badge" title="Classic Admin" />
-                                        )}
-                                        {profileData.isClassicMod && (
-                                            <img src="/RL_badgeMod01.png" alt="Classic Moderator" className="user-badge" title="Classic Moderator" />
-                                        )}
-                                        {profileData.isPlatAdmin && (
-                                            <img src="/RL_badgePlatAdmin01.png" alt="Platformer Admin" className="user-badge" title="Platformer Admin" />
-                                        )}
-                                        {profileData.isPlatMod && (
-                                            <img src="/RL_badgePlatMod01.png" alt="Platformer Moderator" className="user-badge" title="Platformer Moderator" />
-                                        )}
-                                        {profileData.isLeaderboardMod && (
-                                            <img src="/RL_badgelbMod01.png" alt="Leaderboard Moderator" className="user-badge" title="Leaderboard Moderator" />
+                                            <img src="/RL_badgeBooster.png" alt="Layout Booster" className="user-badge" title="Layout Booster" />
                                         )}
                                     </>
                                 )}
