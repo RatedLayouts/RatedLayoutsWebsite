@@ -114,6 +114,16 @@ const Level = () => {
             {error && (
                 <div className="loading-level-error glass" style={{ textAlign: 'center', color: '#ff4444' }}>
                     <p>{error}</p>
+                    <div className="level-actions" style={{ marginTop: '1rem' }}>
+                        <a
+                            href={/^\d+$/.test(levelIdOrName) ? `https://gdbrowser.com/${levelIdOrName}` : `https://gdbrowser.com/search/${levelIdOrName}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="play-gdbrowser-btn"
+                        >
+                            View on GDBrowser
+                        </a>
+                    </div>
                 </div>
             )}
 
