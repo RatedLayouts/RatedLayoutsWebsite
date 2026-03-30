@@ -17,11 +17,18 @@ const Search = () => {
         oldest: false,
         username: '',
         query: '',
-        difficulty: 0
+        difficulty: []
     });
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
+
+        if (type === 'select-multiple') {
+            const values = Array.from(e.target.selectedOptions, option => option.value);
+            setFormData(prev => ({ ...prev, [name]: values }));
+            return;
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
@@ -44,9 +51,18 @@ const Search = () => {
             requestBody.type = formData.type;
         }
 
-        const difficulty = parseInt(formData.difficulty) || 0;
-        if (difficulty !== 0) {
-            requestBody.difficulty = difficulty;
+        if (formData.difficulty && formData.difficulty.length > 0) {
+            const selectedVals = formData.difficulty.filter(val => val !== "0");
+            if (selectedVals.length > 0) {
+                const diffArray = selectedVals
+                    .flatMap(val => String(val).split(','))
+                    .map(val => parseInt(val, 10))
+                    .filter(val => !isNaN(val));
+
+                if (diffArray.length > 0) {
+                    requestBody.difficulty = diffArray;
+                }
+            }
         }
 
         setFetchConfig({
@@ -123,21 +139,23 @@ const Search = () => {
 
                             {/* Row 2: Difficulty, Checkboxes */}
                             <div className="search-row" style={{ alignItems: 'center' }}>
-                                <div className="search-field" style={{ maxWidth: '200px' }}>
+                                <div className="search-field" style={{ maxWidth: '400px' }}>
                                     <label className="search-label">Difficulty</label>
                                     <select
+                                        multiple
                                         name="difficulty"
                                         value={formData.difficulty}
                                         onChange={handleInputChange}
                                         className="search-select"
+                                        style={{ height: '200px' }}
                                     >
                                         <option value="0">Any</option>
                                         <option value="1">Auto</option>
                                         <option value="2">Easy</option>
                                         <option value="3">Normal</option>
-                                        <option value="4">Hard</option>
-                                        <option value="6">Harder</option>
-                                        <option value="8">Insane</option>
+                                        <option value="4,5">Hard</option>
+                                        <option value="6,7">Harder</option>
+                                        <option value="8,9">Insane</option>
                                         <option value="10">Easy Demon</option>
                                         <option value="15">Medium Demon</option>
                                         <option value="20">Hard Demon</option>
