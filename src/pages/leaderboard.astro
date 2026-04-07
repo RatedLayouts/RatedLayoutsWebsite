@@ -4,90 +4,96 @@ import Layout from '../layouts/Layout.astro';
 
 const { searchParams } = Astro.url;
 const page = parseInt(searchParams.get('page') || '1');
+const type = parseInt(searchParams.get('type') || '1');
 
-const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getFeatured?page=${page}`, {
+// Fetch logic
+const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getLeaderboard?type=${type}&page=${page}`, {
   cache: 'no-store'
 });
 const data = await res.json();
-const layouts = data.layouts || [];
-const totalAmount = data.totalAmount || 0;
-const amountPerPage = data.amount || 10;
+const leaderboard = data.leaderboard || [];
+const totalAmount = data.total || 0;
+const amountPerPage = data.amount || 100;
 const totalPages = Math.ceil(totalAmount / amountPerPage);
 
-const getDifficultyPath = (diffValue, featValue) => {
-  let diffName = "NA";
-  let fileName = "na";
-  
-  if (diffValue === 1) { diffName = "AUTO"; fileName = "auto"; }
-  else if (diffValue === 2) { diffName = "EASY"; fileName = "easy"; }
-  else if (diffValue === 3) { diffName = "NORMAL"; fileName = "normal"; }
-  else if (diffValue >= 4 && diffValue <= 5) { diffName = "HARD"; fileName = "hard"; }
-  else if (diffValue >= 6 && diffValue <= 7) { diffName = "HARDER"; fileName = "harder"; }
-  else if (diffValue >= 8 && diffValue <= 9) { diffName = "INSANE"; fileName = "insane"; }
-  else if (diffValue === 10) { diffName = "EASY DEMON"; fileName = "easydemon"; }
-  else if (diffValue === 15) { diffName = "MEDIUM DEMON"; fileName = "mediumdemon"; }
-  else if (diffValue === 20) { diffName = "HARD DEMON"; fileName = "harddemon"; }
-  else if (diffValue === 25) { diffName = "INSANE DEMON"; fileName = "insanedemon"; }
-  else if (diffValue === 30) { diffName = "EXTREME DEMON"; fileName = "extremedemon"; }
-  
-  let featName = "no";
-  if (featValue === 1) featName = "featured";
-  else if (featValue === 2) featName = "epic";
-  else if (featValue === 3) featName = "legendary";
+let statName = "";
+let statIcon = "";
+let statKey = "";
 
-  return `/difficulty/${diffName}/${fileName}_${featName}.png`;
-};
-
-const getStars = (diffValue) => {
-  if (diffValue >= 10) return 10;
-  return diffValue;
-};
+if (type === 1) {
+    statName = "Sparks";
+    statIcon = "/stats/RL_sparkMed.png";
+    statKey = "sparks";
+} else if (type === 2) {
+    statName = "Planets";
+    statIcon = "/stats/RL_planetMed.png";
+    statKey = "planets";
+} else if (type === 3) {
+    statName = "Blueprint Points";
+    statIcon = "/stats/RL_blueprintPoint.png";
+    statKey = "creatorPoints";
+} else if (type === 4) {
+    statName = "Blue Coins";
+    statIcon = "/stats/RL_BlueCoinSmall.png";
+    statKey = "blueCoins";
+}
 ---
 
-<Layout title="Featured Layouts">
+<Layout title="Leaderboard">
   <div class="list-container">
     <div class="header-row">
-      <h1 class="page-title pusab-font">Featured Layouts</h1>
+      <h1 class="page-title pusab-font">Leaderboard</h1>
       <div class="stats-counter pusab-font">
         <div class="current-page">Page {page}</div>
         <div class="total-levels">Total: {totalAmount}</div>
       </div>
     </div>
+
+    <!-- Type Tabs -->
+    <div class="tabs-container">
+      <a href="?type=1&page=1" class={`tab-btn ${type === 1 ? 'active' : ''}`}>
+        <img src="/stats/RL_sparkMed.png" height="25px" width="auto" alt="Sparks" class="tab-icon" />
+        <span class="tab-text pusab-font">Sparks</span>
+      </a>
+      <a href="?type=2&page=1" class={`tab-btn ${type === 2 ? 'active' : ''}`}>
+        <img src="/stats/RL_planetMed.png" height="25px" width="auto" alt="Planets" class="tab-icon" />
+        <span class="tab-text pusab-font">Planets</span>
+      </a>
+      <a href="?type=3&page=1" class={`tab-btn ${type === 3 ? 'active' : ''}`}>
+        <img src="/stats/RL_blueprintPoint.png" height="25px" width="auto" alt="Blueprint Pts" class="tab-icon" />
+        <span class="tab-text pusab-font">Blueprints</span>
+      </a>
+      <a href="?type=4&page=1" class={`tab-btn ${type === 4 ? 'active' : ''}`}>
+        <img src="/stats/RL_BlueCoinSmall.png" height="25px" width="auto" alt="Blue Coins" class="tab-icon" />
+        <span class="tab-text pusab-font">Blue Coins</span>
+      </a>
+    </div>
     
     <div class="layouts-list">
-      {layouts.map((level) => (
-        <div class="level-cell">
-          <!-- Difficulty Face and Label -->
+      {leaderboard.map((user) => (
+        <div 
+          class="user-cell" 
+          style={user.nameplate ? `background: url('https://gdrate.arcticwoof.xyz/nameplates/banner/nameplate_${user.nameplate}.png') center/cover no-repeat, linear-gradient(to bottom, #44e0e2 50%, #186fd2 50%);` : ''}
+        >
+          <!-- Rank Number -->
           <div class="difficulty-container">
-            <img 
-              src={getDifficultyPath(level.difficulty, level.featured)} 
-              alt="Difficulty" 
-              class="difficulty-face"
-            />
+            <span class="rank-number pusab-font">#{user.rank}</span>
           </div>
 
-          <!-- Level Info -->
-          <div class="level-info">
+          <!-- User Info -->
+          <div class="user-info">
             <div class="name-row">
-              <span class="level-name pusab-font">{level.levelName}</span>
-              <span class="level-stars pusab-font">
-                {getStars(level.difficulty)}
-                <img src="/stats/RL_sparkMed.png" alt="Stars" class="stars-icon" />
+              <span class="player-name pusab-font">{user.username}</span>
+              <span class="player-stat pusab-font">
+                <img src={statIcon} alt={statName} class="stars-icon" />
+                {user[statKey]}
               </span>
             </div>
-            <div class="creator-row">
-              <span class="by-label pusab-font">By</span>
-              <span class="creator-name pusab-font">{level.creatorUsername}</span>
-            </div>
           </div>
 
-          <!-- Score and View Button -->
+          <!-- Action Button -->
           <div class="action-container">
-            <div class="featured-score">
-              <span class="score-label">Featured Score:</span>
-              <span class="score-value">{level.featuredScore}</span>
-            </div>
-            <a href={`/level/${level.levelId}`} class="view-button-link">
+            <a href={`/profile/${user.accountId}`} class="view-button-link" style="margin-top:auto;">
               <button class="view-button pusab-font">VIEW</button>
             </a>
           </div>
@@ -98,12 +104,12 @@ const getStars = (diffValue) => {
     <!-- Pagination Controls -->
     <div class="pagination-controls">
       {page > 1 && (
-        <a href={`?page=${page - 1}`} class="nav-button prev-button">
+        <a href={`?type=${type}&page=${page - 1}`} class="nav-button prev-button">
           <img src="/buttons/RL_prev01.png" alt="Previous" class="nav-button-bg" />
         </a>
       )}
       {page < totalPages && (
-        <a href={`?page=${page + 1}`} class="nav-button next-button">
+        <a href={`?type=${type}&page=${page + 1}`} class="nav-button next-button">
           <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
         </a>
       )}
@@ -154,6 +160,43 @@ const getStars = (diffValue) => {
     color: white;
   }
 
+  .tabs-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(to bottom, #4a4a4a, #2a2a2a);
+    border: 3px solid #000;
+    border-radius: 6px;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    font-size: 1.2rem;
+    text-decoration: none;
+    text-shadow: 1px 1px #000;
+    transition: all 0.1s;
+    box-shadow: 0 4px 0 #000;
+  }
+
+  .tab-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .tab-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+  }
+
   .layouts-list {
     display: flex;
     flex-direction: column;
@@ -191,14 +234,6 @@ const getStars = (diffValue) => {
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  .nav-button-text {
-    position: relative;
-    z-index: 2;
-    color: white;
-    font-size: 2rem;
-    text-shadow: 2px 2px #000;
-  }
-
   .nav-button:hover .nav-button-bg {
     transform: scale(1.1);
     filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
@@ -208,8 +243,8 @@ const getStars = (diffValue) => {
     transform: scale(0.95);
   }
 
-  .level-cell {
-    background: linear-gradient(to bottom, #d2b48c 50%, #bc9b6a 50%);
+  .user-cell {
+    background: linear-gradient(to bottom, #44e0e2, #186fd2);
     border: 4px solid #000;
     border-radius: 12px;
     padding: 0.8rem 1.5rem;
@@ -228,13 +263,13 @@ const getStars = (diffValue) => {
     min-width: 80px;
   }
 
-  .difficulty-face {
-    width: 70px;
-    height: auto;
-    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+  .rank-number {
+    font-size: 2.5rem;
+    color: white;
+    text-shadow: 2px 2px #000;
   }
 
-  .level-info {
+  .user-info {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -248,14 +283,14 @@ const getStars = (diffValue) => {
     gap: 1rem;
   }
 
-  .level-name {
+  .player-name {
     font-size: 1.8rem;
     text-transform: uppercase;
-    color: white;
+    color: #ffc800;
     text-shadow: 2px 2px #000;
   }
 
-  .level-stars {
+  .player-stat {
     display: flex;
     align-items: center;
     gap: 0.3rem;
@@ -265,26 +300,8 @@ const getStars = (diffValue) => {
   }
 
   .stars-icon {
-    width: 24px;
+    width: 30px;
     height: auto;
-  }
-
-  .creator-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .by-label {
-    color: #ffc800; /* Gold */
-    font-size: 1.5rem;
-    text-shadow: 1.5px 1.5px #000;
-  }
-
-  .creator-name {
-    color: #ffc800; /* Gold */
-    font-size: 1.5rem;
-    text-shadow: 1.5px 1.5px #000;
   }
 
   .action-container {
@@ -293,17 +310,6 @@ const getStars = (diffValue) => {
     align-items: flex-end;
     justify-content: space-between;
     height: 100%;
-    min-height: 80px;
-  }
-
-  .featured-score {
-    font-family: inherit;
-    font-size: 1rem;
-    text-shadow: 1px 1px #000;
-  }
-
-  .score-value {
-    margin-left: 0.2rem;
   }
 
   .view-button {
@@ -329,7 +335,7 @@ const getStars = (diffValue) => {
   }
 
   @media (max-width: 600px) {
-    .level-cell {
+    .user-cell {
       flex-direction: column;
       align-items: center;
       text-align: center;
