@@ -81,7 +81,7 @@ const getStars = (diffValue) => {
               <span class="level-name pusab-font">{level.levelName}</span>
               <span class="level-stars pusab-font">
                 {getStars(level.difficulty)}
-                <img src="/stats/RL_sparkMed.png" alt="Stars" class="stars-icon" />
+                <img src={level.type === 'platformer' ? "/stats/RL_planetMed.png" : "/stats/RL_sparkMed.png"} alt="Stars" class="stars-icon" />
               </span>
             </div>
             <div class="creator-row">
@@ -105,7 +105,7 @@ const getStars = (diffValue) => {
       
       {layouts.length === 0 && (
           <div class="empty-state pusab-font">
-              <p>No levels found in this gauntlet.</p>
+              <h2>No levels found in this gauntlet. :(</h2>
           </div>
       )}
     </div>
