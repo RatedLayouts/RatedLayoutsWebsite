@@ -571,9 +571,10 @@ import Layout from "../layouts/Layout.astro";
     opacity: 0.6;
     cursor: default;
     transform: none;
+    filter: grayscale(1);
   }
 
-  /* Results Branding (reusing global or specific styles) */
+  /* Results Branding */
   .results-container {
     padding-top: 2rem;
     border-top: 3px solid rgba(255, 255, 255, 0.1);
@@ -718,15 +719,10 @@ import Layout from "../layouts/Layout.astro";
     align-items: center;
     position: relative;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease;
     width: 100%;
     margin-bottom: 1rem;
     color: white;
     box-sizing: border-box;
-  }
-
-  .level-cell:hover {
-    transform: scale(1.01);
   }
 
   .level-cell .difficulty-container {
@@ -834,7 +830,7 @@ import Layout from "../layouts/Layout.astro";
     box-shadow: 0 2px 0 #000;
   }
 
-  .level-cell .view-button:hover {
+  .view-button:hover {
     transform: scale(1.05);
   }
 

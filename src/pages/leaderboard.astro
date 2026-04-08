@@ -103,16 +103,14 @@ if (type === 1) {
 
     <!-- Pagination Controls -->
     <div class="pagination-controls">
-      {page > 1 && (
-        <a href={`?type=${type}&page=${page - 1}`} class="nav-button prev-button">
-          <img src="/buttons/RL_prev01.png" alt="Previous" class="nav-button-bg" />
-        </a>
-      )}
-      {page < totalPages && (
-        <a href={`?type=${type}&page=${page + 1}`} class="nav-button next-button">
-          <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
-        </a>
-      )}
+      <a href={page > 1 ? `?type=${type}&page=${page - 1}` : '#'} 
+         class={`nav-button prev-button ${page <= 1 ? 'disabled' : ''}`}>
+        <img src="/buttons/RL_prev01.png" alt="Previous" class="nav-button-bg" />
+      </a>
+      <a href={page < totalPages ? `?type=${type}&page=${page + 1}` : '#'} 
+         class={`nav-button next-button ${page >= totalPages ? 'disabled' : ''}`}>
+        <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
+      </a>
     </div>
   </div>
 </Layout>
@@ -232,6 +230,13 @@ if (type === 1) {
     object-fit: contain;
     z-index: 1;
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .nav-button.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: default;
+    filter: grayscale(1);
   }
 
   .nav-button:hover .nav-button-bg {

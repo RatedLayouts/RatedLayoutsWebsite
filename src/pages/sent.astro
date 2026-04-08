@@ -183,9 +183,6 @@ const getDifficultyPath = (diffValue, featValue) => {
               <span class="score-label">Total Suggestions:</span>
               <span class="score-value">{level.totalSuggests}</span>
             </div>
-            <a href={`/level/${level.levelId}`} class="view-button-link">
-              <button class="view-button pusab-font">VIEW</button>
-            </a>
           </div>
         </div>
       ))}
@@ -199,16 +196,14 @@ const getDifficultyPath = (diffValue, featValue) => {
 
     <!-- Pagination Controls -->
     <div class="pagination-controls">
-      {page > 1 && (
-        <a href={`?page=${page - 1}`} class="nav-button prev-button">
-          <img src="/buttons/RL_prev01.png" alt="Previous" class="nav-button-bg" />
-        </a>
-      )}
-      {page < totalPages && (
-        <a href={`?page=${page + 1}`} class="nav-button next-button">
-          <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
-        </a>
-      )}
+      <a href={page > 1 ? `?page=${page - 1}${searchTerm ? `&type=${searchType}&q=${encodeURIComponent(searchTerm)}` : ''}` : '#'} 
+         class={`nav-button prev-button ${page <= 1 ? 'disabled' : ''}`}>
+        <img src="/buttons/RL_prev01.png" alt="Previous" class="nav-button-bg" />
+      </a>
+      <a href={page < totalPages ? `?page=${page + 1}${searchTerm ? `&type=${searchType}&q=${encodeURIComponent(searchTerm)}` : ''}` : '#'} 
+         class={`nav-button next-button ${page >= totalPages ? 'disabled' : ''}`}>
+        <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
+      </a>
     </div>
   </div>
 </Layout>
@@ -345,6 +340,13 @@ const getDifficultyPath = (diffValue, featValue) => {
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
+  .nav-button.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: default;
+    filter: grayscale(1);
+  }
+
   .nav-button:hover .nav-button-bg {
     transform: scale(1.1);
     filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
@@ -470,7 +472,6 @@ const getDifficultyPath = (diffValue, featValue) => {
   .featured-score {
     font-family: inherit;
     font-size: 1rem;
-    color: #ffd966;
     text-shadow: 1px 1px #000;
   }
 

@@ -10,19 +10,25 @@ interface Gauntlet {
 
 interface Props {
   gauntlet: Gauntlet;
+  prevId: number | null;
+  nextId: number | null;
 }
 
 export async function getStaticPaths() {
   const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getGauntlets`);
   const gauntlets = (await res.json() || []) as Gauntlet[];
   
-  return gauntlets.map(g => ({
+  return gauntlets.map((g, index) => ({
     params: { id: g.gauntletId.toString() },
-    props: { gauntlet: g }
+    props: { 
+      gauntlet: g,
+      prevId: index > 0 ? gauntlets[index - 1].gauntletId : null,
+      nextId: index < gauntlets.length - 1 ? gauntlets[index + 1].gauntletId : null
+    }
   }));
 }
 
-const { gauntlet } = Astro.props as Props;
+const { gauntlet, prevId, nextId } = Astro.props as Props;
 
 if (!gauntlet) {
   return Astro.redirect('/gauntlets');
@@ -120,6 +126,18 @@ const getStars = (diffValue) => {
           </div>
       )}
     </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls">
+      <a href={prevId ? `/gauntlet/${prevId}` : '#'} 
+         class={`nav-button prev-button ${!prevId ? 'disabled' : ''}`}>
+        <img src="/buttons/RL_prev01.png" alt="Previous" class="nav-button-bg" />
+      </a>
+      <a href={nextId ? `/gauntlet/${nextId}` : '#'} 
+         class={`nav-button next-button ${!nextId ? 'disabled' : ''}`}>
+        <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
+      </a>
+    </div>
   </div>
 </Layout>
 
@@ -175,6 +193,53 @@ const getStars = (diffValue) => {
   
   .back-button:active {
       transform: scale(0.95);
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .nav-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+    width: 60px;
+    height: 60px;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .nav-button-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 1;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .nav-button.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: default;
+    filter: grayscale(1);
+  }
+
+  .nav-button:hover .nav-button-bg {
+    transform: scale(1.1);
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+  }
+
+  .nav-button:active .nav-button-bg {
+    transform: scale(0.95);
   }
 
   .layouts-list {
