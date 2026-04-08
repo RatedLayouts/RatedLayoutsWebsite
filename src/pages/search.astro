@@ -1,0 +1,909 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Search Layouts">
+  <div class="search-container">
+    <div class="header-row">
+      <h1 class="page-title pusab-font">Search</h1>
+    </div>
+
+    <!-- Search Panel -->
+    <div class="search-panel">
+      <div class="panel-section">
+        <div class="input-group">
+          <label class="pusab-font label-small">Query</label>
+          <input
+            type="text"
+            id="query-input"
+            class="pusab-font main-input"
+            placeholder="Search level name..."
+          />
+        </div>
+        <div class="input-group">
+          <label class="pusab-font label-small">Username</label>
+          <input
+            type="text"
+            id="username-input"
+            class="pusab-font main-input"
+            placeholder="Creator name..."
+          />
+        </div>
+      </div>
+
+      <!-- Toggles Section: Featured Ratings -->
+      <div class="panel-section grid-section">
+        <div class="toggle-group" data-value="award">
+          <img src="/icons/RL_uncheck.png" class="check-icon" alt="toggle" />
+          <span class="pusab-font toggle-label">Award</span>
+        </div>
+        <div class="toggle-group" data-value="featured">
+          <img src="/icons/RL_uncheck.png" class="check-icon" alt="toggle" />
+          <span class="pusab-font toggle-label">Featured</span>
+        </div>
+        <div class="toggle-group" data-value="epic">
+          <img src="/icons/RL_uncheck.png" class="check-icon" alt="toggle" />
+          <span class="pusab-font toggle-label">Epic</span>
+        </div>
+        <div class="toggle-group" data-value="legendary">
+          <img src="/icons/RL_uncheck.png" class="check-icon" alt="toggle" />
+          <span class="pusab-font toggle-label">Legendary</span>
+        </div>
+      </div>
+
+      <!-- Toggles Section: Type and Order -->
+      <div class="panel-section grid-section-three">
+        <div class="type-switch-container">
+          <span class="pusab-font toggle-label">Type:</span>
+          <select id="type-select" class="pusab-font gd-select">
+            <option value="all">All</option>
+            <option value="classic">Classic</option>
+            <option value="platformer">Platformer</option>
+          </select>
+        </div>
+        <div class="toggle-group" id="oldest-toggle">
+          <img src="/icons/RL_uncheck.png" class="check-icon" alt="toggle" />
+          <span class="pusab-font toggle-label">Oldest First</span>
+        </div>
+        <div class="toggle-group" id="demon-mode-toggle">
+          <img src="/icons/RL_uncheck.png" class="check-icon" alt="toggle" />
+          <span class="pusab-font toggle-label">Demon Only</span>
+        </div>
+      </div>
+
+      <!-- Difficulty Selection -->
+      <label
+        class="pusab-font label-small"
+        style="margin-bottom: 1rem; display: block;">Difficulty</label
+      >
+      <div class="panel-section difficulty-section">
+        <div class="difficulty-grid" id="difficulty-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <button id="search-btn" class="pusab-font big-search-btn">SEARCH</button>
+    </div>
+
+    <!-- Results Panel -->
+    <div id="results-container" class="results-container">
+      <div id="results-header" class="results-header hidden">
+        <h2 class="pusab-font results-title">Results</h2>
+        <div id="stats-counter" class="stats-counter pusab-font">
+          <div id="current-page-display">Page 1</div>
+          <div id="total-levels-display">Total: 0</div>
+        </div>
+      </div>
+
+      <div id="loading-spinner" class="spinner-container hidden">
+        <div class="loading-text pusab-font">LOADING...</div>
+      </div>
+      <div id="results-list" class="layouts-list"></div>
+
+      <!-- Pagination -->
+      <div id="pagination-controls" class="pagination-controls hidden">
+        <button id="prev-btn" class="nav-button">
+          <img src="/buttons/RL_prev01.png" alt="Prev" class="nav-button-bg" />
+        </button>
+        <button id="next-btn" class="nav-button">
+          <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
+        </button>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Search State
+  let demonMode = false;
+  let selectedDifficulties: number[] = [];
+  let currentPage = 1;
+  let totalPages = 1;
+  const awardsState = {
+    award: 0,
+    featured: 0,
+    epic: 0,
+    legendary: 0,
+    oldest: 0,
+  };
+
+  const difficultyGrid = document.getElementById(
+    "difficulty-grid",
+  ) as HTMLElement;
+  const demonModeBtn = document.getElementById(
+    "demon-mode-toggle",
+  ) as HTMLElement;
+
+  const standardDiffs = [
+    { id: 1, name: "auto", label: "AUTO" },
+    { id: 2, name: "easy", label: "EASY" },
+    { id: 3, name: "normal", label: "NORMAL" },
+    { id: 4, name: "hard", label: "HARD" },
+    { id: 6, name: "harder", label: "HARDER" },
+    { id: 8, name: "insane", label: "INSANE" },
+  ];
+
+  const demonDiffs = [
+    { id: 10, name: "easy_demon", label: "Easy" },
+    { id: 15, name: "medium_demon", label: "Medium" },
+    { id: 20, name: "hard_demon", label: "Hard" },
+    { id: 25, name: "insane_demon", label: "Insane" },
+    { id: 30, name: "extreme_demon", label: "Extreme" },
+  ];
+
+  function renderDifficulties() {
+    difficultyGrid.innerHTML = "";
+    const diffs = demonMode ? demonDiffs : standardDiffs;
+
+    diffs.forEach((diff) => {
+      const item = document.createElement("div");
+      item.className = `difficulty-item ${selectedDifficulties.includes(diff.id) ? "active" : ""}`;
+      item.innerHTML = `
+        <img class="difficulty-face" src="${getDifficultyPath(diff.id, 0)}" alt="${diff.label}" />
+      `;
+      item.addEventListener("click", () => {
+        if (selectedDifficulties.includes(diff.id)) {
+          selectedDifficulties = selectedDifficulties.filter(
+            (i) => i !== diff.id,
+          );
+        } else {
+          selectedDifficulties.push(diff.id);
+        }
+        renderDifficulties();
+      });
+      difficultyGrid.appendChild(item);
+    });
+  }
+
+  // Toggles Logic
+  document.querySelectorAll(".toggle-group").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const field = btn.getAttribute("data-value");
+      const isOldest = btn.id === "oldest-toggle";
+      const isDemon = btn.id === "demon-mode-toggle";
+      const checkIcon = btn.querySelector(".check-icon") as HTMLImageElement;
+
+      if (isDemon) {
+        demonMode = !demonMode;
+        selectedDifficulties = [];
+        if (checkIcon) {
+          checkIcon.src = demonMode
+            ? "/icons/RL_check.png"
+            : "/icons/RL_uncheck.png";
+        }
+        renderDifficulties();
+        return;
+      }
+
+      if (isOldest) {
+        awardsState.oldest = awardsState.oldest === 1 ? 0 : 1;
+        if (checkIcon) {
+          checkIcon.src =
+            awardsState.oldest === 1
+              ? "/icons/RL_check.png"
+              : "/icons/RL_uncheck.png";
+        }
+        return;
+      }
+
+      if (field && field in awardsState) {
+        const key = field as keyof typeof awardsState;
+        awardsState[key] = awardsState[key] === 1 ? 0 : 1;
+        if (checkIcon) {
+          checkIcon.src =
+            awardsState[key] === 1
+              ? "/icons/RL_check.png"
+              : "/icons/RL_uncheck.png";
+        }
+      }
+    });
+  });
+
+  function updatePagination(totalAmount: number) {
+    const controls = document.getElementById(
+      "pagination-controls",
+    ) as HTMLElement;
+    const resultsHeader = document.getElementById(
+      "results-header",
+    ) as HTMLElement;
+    const currentPageDisplay = document.getElementById(
+      "current-page-display",
+    ) as HTMLElement;
+    const totalLevelsDisplay = document.getElementById(
+      "total-levels-display",
+    ) as HTMLElement;
+
+    resultsHeader.classList.remove("hidden");
+    currentPageDisplay.innerText = `Page ${currentPage}`;
+    totalLevelsDisplay.innerText = `Total: ${totalAmount}`;
+
+    if (totalPages <= 1) {
+      controls.classList.add("hidden");
+      return;
+    }
+
+    controls.classList.remove("hidden");
+
+    const prevBtn = document.getElementById("prev-btn") as HTMLButtonElement;
+    const nextBtn = document.getElementById("next-btn") as HTMLButtonElement;
+
+    prevBtn.style.opacity = currentPage <= 1 ? "0.3" : "1";
+    prevBtn.style.pointerEvents = currentPage <= 1 ? "none" : "auto";
+
+    nextBtn.style.opacity = currentPage >= totalPages ? "0.3" : "1";
+    nextBtn.style.pointerEvents = currentPage >= totalPages ? "none" : "auto";
+  }
+
+  // Search Logic
+  const resultsList = document.getElementById("results-list") as HTMLElement;
+  const spinner = document.getElementById("loading-spinner") as HTMLElement;
+  const searchBtn = document.getElementById("search-btn") as HTMLButtonElement;
+
+  searchBtn.addEventListener("click", () => {
+    currentPage = 1;
+    performSearch();
+  });
+
+  async function performSearch() {
+    searchBtn.disabled = true;
+    spinner.classList.remove("hidden");
+    resultsList.innerHTML = "";
+    document.getElementById("results-header")?.classList.add("hidden");
+    document.getElementById("pagination-controls")?.classList.add("hidden");
+
+    const payload = {
+      type:
+        (document.getElementById("type-select") as HTMLSelectElement).value ===
+        "all"
+          ? ""
+          : (document.getElementById("type-select") as HTMLSelectElement).value,
+      award: awardsState.award,
+      featured: awardsState.featured,
+      epic: awardsState.epic,
+      legendary: awardsState.legendary,
+      oldest: awardsState.oldest,
+      username: (document.getElementById("username-input") as HTMLInputElement)
+        .value,
+      query: (document.getElementById("query-input") as HTMLInputElement).value,
+      difficulty: selectedDifficulties.length > 0 ? selectedDifficulties : null,
+      page: currentPage,
+    };
+
+    try {
+      const res = await fetch("https://gdrate.arcticwoof.xyz/v1/getLayouts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      const layouts = data.layouts || [];
+      const totalAmount = data.totalAmount || 0;
+      const amountPerPage = 10;
+      totalPages = Math.ceil(totalAmount / amountPerPage);
+
+      renderResults(layouts);
+      updatePagination(totalAmount);
+    } catch (e) {
+      resultsList.innerHTML =
+        '<div class="empty-state pusab-font">Failed to fetch layouts... :(</div>';
+    } finally {
+      spinner.classList.add("hidden");
+      searchBtn.disabled = false;
+      window.scrollTo({ top: resultsList.offsetTop - 100, behavior: "smooth" });
+    }
+  }
+
+  document.getElementById("prev-btn")?.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      performSearch();
+    }
+  });
+
+  document.getElementById("next-btn")?.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      performSearch();
+    }
+  });
+
+  function getStars(diffValue: number) {
+    if (diffValue >= 10) return 10;
+    return diffValue;
+  }
+
+  function renderResults(layouts: any[]) {
+    if (layouts.length === 0) {
+      resultsList.innerHTML =
+        '<div class="empty-state pusab-font">No levels found matching your criteria.</div>';
+      return;
+    }
+
+    resultsList.innerHTML = layouts
+      .map(
+        (level) => `
+      <div class="level-cell">
+        <!-- Difficulty Face and Label -->
+        <div class="difficulty-container">
+          <img 
+            src="${getDifficultyPath(level.difficulty, level.featured)}" 
+            alt="Difficulty" 
+            class="difficulty-face"
+          />
+        </div>
+
+        <!-- Level Info -->
+        <div class="level-info">
+          <div class="name-row">
+            <span class="level-name pusab-font">${level.levelName}</span>
+            <span class="level-stars pusab-font">
+              ${getStars(level.difficulty)}
+              <img src="${level.type === "platformer" ? "/stats/RL_planetMed.png" : "/stats/RL_sparkMed.png"}" alt="Stars" class="stars-icon" />
+            </span>
+          </div>
+          <div class="creator-row">
+            <span class="by-label pusab-font">By</span>
+            <a href="/profile/${level.creatorAccountId}" class="creator-link">
+              <span class="creator-name pusab-font">${level.creatorUsername}</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Score and View Button -->
+        <div class="action-container">
+          <div class="featured-score">
+            <span class="score-label">Featured Score:</span>
+            <span class="score-value">${level.featuredScore || 0}</span>
+          </div>
+          <a href="/level/${level.levelId}" class="view-button-link">
+            <button class="view-button pusab-font">VIEW</button>
+          </a>
+        </div>
+      </div>
+    `,
+      )
+      .join("");
+  }
+
+  // Helper duplicated from main logic for client-side use
+  function getDifficultyPath(diff: number, feat: number) {
+    let diffName = "NA";
+    let fileName = "na";
+    if (diff === 1) {
+      diffName = "AUTO";
+      fileName = "auto";
+    } else if (diff === 2) {
+      diffName = "EASY";
+      fileName = "easy";
+    } else if (diff === 3) {
+      diffName = "NORMAL";
+      fileName = "normal";
+    } else if (diff >= 4 && diff <= 5) {
+      diffName = "HARD";
+      fileName = "hard";
+    } else if (diff >= 6 && diff <= 7) {
+      diffName = "HARDER";
+      fileName = "harder";
+    } else if (diff >= 8 && diff <= 9) {
+      diffName = "INSANE";
+      fileName = "insane";
+    } else if (diff === 10) {
+      diffName = "EASY DEMON";
+      fileName = "easydemon";
+    } else if (diff === 15) {
+      diffName = "MEDIUM DEMON";
+      fileName = "mediumdemon";
+    } else if (diff === 20) {
+      diffName = "HARD DEMON";
+      fileName = "harddemon";
+    } else if (diff === 25) {
+      diffName = "INSANE DEMON";
+      fileName = "insanedemon";
+    } else if (diff === 30) {
+      diffName = "EXTREME DEMON";
+      fileName = "extremedemon";
+    }
+    let f = "no";
+    if (feat === 1) f = "featured";
+    else if (feat === 2) f = "epic";
+    else if (feat === 3) f = "legendary";
+    return `/difficulty/${diffName}/${fileName}_${f}.png`;
+  }
+
+  renderDifficulties();
+</script>
+
+<style>
+  .search-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .page-title {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 2.5rem;
+    text-align: center;
+    font-size: 2.5rem;
+  }
+
+  /* Panel Styling */
+  .search-panel {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    margin-bottom: 4rem;
+  }
+
+  .panel-section {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .grid-section {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .grid-section-three {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .label-small {
+    color: #4cbdff;
+    font-size: 1.1rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .main-input {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #000;
+    border-radius: 10px;
+    padding: 0.8rem 1.2rem;
+    color: white;
+    font-size: 1.2rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .main-input:focus {
+    border-color: #00d2ff;
+  }
+
+  .gd-select {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #000;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.1rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* Toggles */
+  .toggle-group {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid #000;
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.1s;
+    user-select: none;
+  }
+
+  .toggle-group:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .check-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .toggle-label {
+    font-size: 1rem;
+    color: white;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  /* Search Button */
+  .big-search-btn {
+    width: 100%;
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+    border: 4px solid #000;
+    border-radius: 12px;
+    color: white;
+    padding: 1.2rem;
+    font-size: 2rem;
+    cursor: pointer;
+    text-shadow: 2px 2px #000;
+    box-shadow: 0 6px 0 #000;
+    margin-top: 1rem;
+    transition: all 0.1s;
+    letter-spacing: 2px;
+  }
+
+  .big-search-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .big-search-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+    filter: grayscale(1);
+  }
+
+  /* Results Branding */
+  .results-container {
+    padding-top: 2rem;
+    border-top: 3px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .layouts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .spinner-container {
+    display: flex;
+    justify-content: center;
+    padding: 4rem;
+  }
+
+  .loading-text {
+    font-size: 2rem;
+    color: #4cbdff;
+    animation: blink 1s infinite alternate;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+  }
+
+  .results-title {
+    font-size: 2rem;
+    color: white;
+    text-shadow: 2px 2px #000;
+    margin: 0;
+  }
+
+  .stats-counter {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    text-align: right;
+    color: #ffd966;
+    text-shadow: 1px 1px #000;
+  }
+
+  #current-page-display {
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  #total-levels-display {
+    font-size: 1rem;
+    color: white;
+  }
+
+  @keyframes blink {
+    from {
+      opacity: 0.3;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 5rem;
+    font-size: 1.8rem;
+    color: #ffc800;
+  }
+</style>
+
+<style is:global>
+  /* Global styles for dynamically created difficulty items (Filter Grid) */
+  .difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 20px;
+    border: 3px solid rgba(0, 0, 0, 0.5);
+    margin: 1rem 0;
+    width: 100%;
+  }
+
+  .difficulty-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 3px solid rgba(0, 0, 0, 0.3);
+    padding: 1rem 0.5rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    user-select: none;
+    width: 120px;
+    height: 120px;
+  }
+
+  .difficulty-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .difficulty-item.active {
+    background: rgba(0, 210, 255, 0.2);
+    border-color: #00d2ff;
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+  }
+
+  .difficulty-item .difficulty-face {
+    width: auto;
+    height: 80px;
+    scale: 1.5;
+    filter: brightness(0.3) grayscale(0.8);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .difficulty-item.active .difficulty-face {
+    filter: brightness(1.1) grayscale(0)
+      drop-shadow(0 0 10px rgba(0, 210, 255, 0.6));
+  }
+
+  /* Global styles for search results (Level Cells) */
+  .level-cell {
+    background: linear-gradient(to bottom, #d2b48c 50%, #bc9b6a 50%);
+    border: 4px solid #000;
+    border-radius: 12px;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    margin-bottom: 1rem;
+    color: white;
+    box-sizing: border-box;
+  }
+
+  .level-cell .difficulty-container {
+    margin-right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+  }
+
+  .level-cell .difficulty-face {
+    width: 100px;
+    height: auto;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+  }
+
+  .level-cell .level-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+  }
+
+  .level-cell .name-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .level-cell .level-name {
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    color: white;
+    text-shadow: 2px 2px #000;
+  }
+
+  .level-cell .level-stars {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 1.8rem;
+    color: white;
+    text-shadow: 2px 2px #000;
+  }
+
+  .level-cell .stars-icon {
+    width: 24px;
+    height: auto;
+  }
+
+  .level-cell .creator-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .level-cell .by-label {
+    color: #ffc800;
+    font-size: 1.5rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .level-cell .creator-name {
+    color: #ffc800;
+    font-size: 1.5rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .level-cell .creator-link {
+    text-decoration: none;
+    transition: transform 0.1s;
+    display: inline-block;
+  }
+
+  .level-cell .creator-link:hover {
+    transform: scale(1.05);
+  }
+
+  .level-cell .action-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 80px;
+  }
+
+  .level-cell .featured-score {
+    font-family: inherit;
+    font-size: 1rem;
+    text-shadow: 1px 1px #000;
+    color: white;
+  }
+
+  .level-cell .score-value {
+    margin-left: 0.2rem;
+  }
+
+  .level-cell .view-button {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+    border: 3px solid #000;
+    border-radius: 6px;
+    color: white;
+    padding: 0.4rem 1.2rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    text-shadow: 1px 1px #000;
+    box-shadow: 0 4px 0 #000;
+    transition: all 0.1s;
+  }
+
+  .level-cell .view-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .view-button:hover {
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 600px) {
+    .level-cell {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 1rem;
+    }
+    .level-cell .difficulty-container {
+      margin-right: 0;
+      margin-bottom: 0.5rem;
+    }
+    .level-cell .name-row,
+    .level-cell .creator-row {
+      justify-content: center;
+    }
+    .level-cell .action-container {
+      align-items: center;
+      margin-top: 1rem;
+    }
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+    width: 100%;
+  }
+
+  .nav-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 60px;
+    height: 60px;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .nav-button-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 1;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .nav-button:hover .nav-button-bg {
+    transform: scale(1.1);
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+  }
+
+  .nav-button:active .nav-button-bg {
+    transform: scale(0.95);
+  }
+</style>

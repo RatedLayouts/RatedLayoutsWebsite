@@ -1,0 +1,536 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+
+// 1. Fetch sends from gdrate
+const { searchParams } = Astro.url;
+const page = parseInt(searchParams.get('page') || '1');
+const searchType = searchParams.get('type') || 'username';
+const searchTerm = searchParams.get('q') || '';
+
+let apiUrl = `https://gdrate.arcticwoof.xyz/v1/getSends?page=${page}`;
+if (searchTerm) {
+  apiUrl += `&${searchType}=${encodeURIComponent(searchTerm)}`;
+}
+
+const res = await fetch(apiUrl, {
+  cache: 'no-store'
+});
+const sendsData = await res.json() || { layouts: [] };
+const layouts = sendsData.layouts || [];
+const totalAmount = sendsData.totalAmount || 0;
+const amountPerPage = sendsData.amount || 10;
+const totalPages = Math.ceil(totalAmount / amountPerPage);
+
+// Extract all level IDs
+const ids = layouts.map(l => l.levelId).join(',');
+
+// Fetch specific level metadata from boomlings
+let levelDataMap = {};
+
+if (ids.length > 0) {
+  const body = new URLSearchParams({
+    secret: 'Wmfd2893gb7',
+    type: '19',
+    str: ids
+  });
+
+  try {
+    const gdRes = await fetch('http://www.boomlings.com/database/getGJLevels21.php', {
+      method: 'POST',
+      headers: { 'User-Agent': '' },
+      body
+    });
+
+    const gdText = await gdRes.text();
+    const parts = gdText.split('#');
+    const gdLevelsStr = parts[0] ? parts[0] : '';
+    const gdCreatorsStr = parts.length > 1 ? parts[1] : '';
+
+    // build creator map (userID -> username)
+    const creatorMap = {};
+    if (gdCreatorsStr) {
+      gdCreatorsStr.split('|').forEach(creator => {
+        const cParts = creator.split(':');
+        if (cParts.length >= 2) {
+          creatorMap[cParts[0]] = cParts[1];
+        }
+      });
+    }
+
+    // build level metadata map
+    if (gdLevelsStr) {
+      gdLevelsStr.split('|').forEach(lvl => {
+        const elements = lvl.split(':');
+        let lvlObj = {};
+        for(let i = 0; i < elements.length; i += 2) {
+          if (i+1 < elements.length) {
+            lvlObj[elements[i]] = elements[i+1];
+          }
+        }
+        
+        const levelId = lvlObj['1'];
+        if (levelId) {
+          const levelName = lvlObj['2'] || 'Unknown';
+          const playerId = lvlObj['6'];
+          const levelLength = lvlObj['15'];
+          const creatorName = creatorMap[playerId] || 'Unknown';
+          
+          levelDataMap[levelId.toString()] = { levelName, creatorName, levelLength: parseInt(levelLength) || 0 };
+        }
+      });
+    }
+  } catch (err) {
+    console.error("Failed fetching levels from Boomlings", err);
+  }
+}
+
+// 3. Map retrieved data onto original layouts array
+layouts.forEach(l => {
+  const meta = levelDataMap[l.levelId.toString()];
+  l.levelName = meta ? meta.levelName : 'Unknown';
+  l.creatorUsername = meta ? meta.creatorName : '-';
+  l.isPlatformer = meta ? (meta.levelLength === 5) : false;
+  
+  // Calculate featured status based on suggested counts
+  l.featuredStatus = 0;
+  if (l.suggestedLegendary > 0) l.featuredStatus = 3;
+  else if (l.suggestedEpic > 0) l.featuredStatus = 2;
+  else if (l.suggestedFeatured > 0) l.featuredStatus = 1;
+});
+
+// Difficulty logic identical to featured.astro
+const getDifficultyPath = (diffValue, featValue) => {
+  const diff = Math.round(diffValue);
+  let diffName = "NA";
+  let fileName = "NA";
+  
+  if (diff === 1) { diffName = "AUTO"; fileName = "auto"; }
+  else if (diff === 2) { diffName = "EASY"; fileName = "easy"; }
+  else if (diff === 3) { diffName = "NORMAL"; fileName = "normal"; }
+  else if (diff >= 4 && diff <= 5) { diffName = "HARD"; fileName = "hard"; }
+  else if (diff >= 6 && diff <= 7) { diffName = "HARDER"; fileName = "harder"; }
+  else if (diff >= 8 && diff <= 9) { diffName = "INSANE"; fileName = "insane"; }
+  else if (diff === 10) { diffName = "EASY DEMON"; fileName = "easydemon"; }
+  else if (diff === 15) { diffName = "MEDIUM DEMON"; fileName = "mediumdemon"; }
+  else if (diff === 20) { diffName = "HARD DEMON"; fileName = "harddemon"; }
+  else if (diff === 25) { diffName = "INSANE DEMON"; fileName = "insanedemon"; }
+  else if (diff === 30) { diffName = "EXTREME DEMON"; fileName = "extremedemon"; }
+  
+  let featName = "no";
+
+  return `/difficulty/${diffName}/${fileName}_${featName}.png`;
+};
+---
+
+<Layout title="Sent Levels">
+  <div class="list-container">
+    <div class="header-row">
+      <h1 class="page-title pusab-font">Sent Levels</h1>
+      <div class="stats-counter pusab-font">
+        <div class="current-page">Page {page}</div>
+        <div class="total-levels">Total Sent: {totalAmount}</div>
+      </div>
+    </div>
+
+    <form method="get" class="search-form">
+      <select name="type" class="pusab-font search-select">
+        <option value="username" selected={searchType === 'username'}>Username</option>
+        <option value="accountId" selected={searchType === 'accountId'}>Account ID</option>
+      </select>
+      <input type="text" name="q" value={searchTerm} class="pusab-font search-input" placeholder="Search..." />
+      <button type="submit" class="pusab-font search-btn">Search</button>
+    </form>
+    
+    <div class="layouts-list">
+      {layouts.map((level) => (
+        <div class="level-cell">
+          <!-- Difficulty Face -->
+          <div class="difficulty-container">
+            <img 
+              src={getDifficultyPath(level.averageDifficulty, level.featuredStatus)} 
+              alt="Difficulty" 
+              class="difficulty-face"
+            />
+          </div>
+
+          <!-- Level Info -->
+          <div class="level-info">
+            <div class="name-row">
+              <span class="level-name pusab-font">{level.levelName}</span>
+              <span class="level-stars pusab-font">
+                {typeof level.averageDifficulty === 'number' ? Number(level.averageDifficulty.toFixed(2)) : level.averageDifficulty}
+                <img src={level.isPlatformer ? "/stats/RL_planetMed.png" : "/stats/RL_sparkMed.png"} alt="Stars" class="stars-icon" />
+              </span>
+            </div>
+            <div class="creator-row">
+              <span class="by-label pusab-font">By</span>
+                <span class="creator-name pusab-font">{level.creatorUsername}</span>
+            </div>
+            <div class="suggests-row">
+               <span class="suggest-value pusab-font">{level.suggestedFeatured}</span>
+               <img src="/difficulty/NA/NA_featured.png" alt="Suggested Featured" class="suggest-icon" />
+               <span class="suggest-value pusab-font">{level.suggestedEpic}</span>
+               <img src="/difficulty/NA/NA_epic.png" alt="Suggested Epic" class="suggest-icon" />
+               <span class="suggest-value pusab-font">{level.suggestedLegendary}</span>
+               <img src="/difficulty/NA/NA_legendary.png" alt="Suggested Legendary" class="suggest-icon" />
+            </div>
+          </div>
+
+          <!-- Score & Views -->
+          <div class="action-container">
+            <div class="featured-score">
+              <span class="score-label">Total Suggestions:</span>
+              <span class="score-value">{level.totalSuggests}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+      
+      {layouts.length === 0 && (
+          <div class="empty-state pusab-font">
+              <h2>No sent levels found. :(</h2>
+          </div>
+      )}
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls">
+      <a href={page > 1 ? `?page=${page - 1}${searchTerm ? `&type=${searchType}&q=${encodeURIComponent(searchTerm)}` : ''}` : '#'} 
+         class={`nav-button prev-button ${page <= 1 ? 'disabled' : ''}`}>
+        <img src="/buttons/RL_prev01.png" alt="Previous" class="nav-button-bg" />
+      </a>
+      <a href={page < totalPages ? `?page=${page + 1}${searchTerm ? `&type=${searchType}&q=${encodeURIComponent(searchTerm)}` : ''}` : '#'} 
+         class={`nav-button next-button ${page >= totalPages ? 'disabled' : ''}`}>
+        <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
+      </a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .list-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem;
+    position: relative;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin: 0;
+  }
+
+  .search-form {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    margin: 0 auto 2rem auto;
+    width: 100%;
+  }
+
+  .search-select {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #000;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    width: auto;
+  }
+
+  .search-input {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #000;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    outline: none;
+    flex: 1;
+  }
+
+  .search-input::placeholder {
+    color: rgba(255,255,255,0.5);
+  }
+
+  .search-btn {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+    border: 3px solid #000;
+    border-radius: 6px;
+    color: white;
+    padding: 0.4rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    text-shadow: 1px 1px #000;
+    box-shadow: 0 4px 0 #000;
+    transition: all 0.1s;
+  }
+
+  .search-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .stats-counter {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    text-align: right;
+    color: #ffd966;
+    text-shadow: 1px 1px #000;
+  }
+
+  .current-page {
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  .total-levels {
+    font-size: 1rem;
+    color: white;
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .nav-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+    width: 60px;
+    height: 60px;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .nav-button-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 1;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .nav-button.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    cursor: default;
+    filter: grayscale(1);
+  }
+
+  .nav-button:hover .nav-button-bg {
+    transform: scale(1.1);
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+  }
+
+  .nav-button:active .nav-button-bg {
+    transform: scale(0.95);
+  }
+
+  .layouts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .level-cell {
+    background: linear-gradient(to bottom, #d2b48c 50%, #bc9b6a 50%);
+    border: 4px solid #000;
+    border-radius: 12px;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease;
+  }
+
+  .difficulty-container {
+    margin-right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+  }
+
+  .difficulty-face {
+    width: 100px;
+    height: auto;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+  }
+
+  .level-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+  }
+
+  .name-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .level-name {
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    color: white;
+    text-shadow: 2px 2px #000;
+  }
+
+  .level-stars {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 1.8rem;
+    color: white;
+    text-shadow: 2px 2px #000;
+  }
+
+  .stars-icon {
+    width: 24px;
+    height: auto;
+  }
+
+  .creator-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .by-label {
+    color: #ffc800; /* Gold */
+    font-size: 1.5rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .creator-name {
+    color: #ffc800; /* Gold */
+    font-size: 1.5rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .suggests-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .suggest-value {
+    color: white;
+    font-size: 1.2rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .suggest-icon {
+    width: 30px;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  }
+
+  .action-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 80px;
+  }
+
+  .featured-score {
+    font-family: inherit;
+    font-size: 1rem;
+    text-shadow: 1px 1px #000;
+  }
+
+  .score-value {
+    margin-left: 0.2rem;
+  }
+
+  .view-button {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+    border: 3px solid #000;
+    border-radius: 6px;
+    color: white;
+    padding: 0.4rem 1.2rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    text-shadow: 1px 1px #000;
+    box-shadow: 0 4px 0 #000;
+    transition: all 0.1s;
+  }
+
+  .view-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .view-button:hover {
+    transform: scale(1.05);
+  }
+  
+  .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      border: 3px solid #000;
+      font-size: 1.5rem;
+      text-shadow: 2px 2px #000;
+  }
+
+  @media (max-width: 600px) {
+    .level-cell {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .difficulty-container {
+      margin-right: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .name-row, .creator-row {
+      justify-content: center;
+    }
+
+    .action-container {
+      align-items: center;
+      margin-top: 1rem;
+    }
+  }
+</style>

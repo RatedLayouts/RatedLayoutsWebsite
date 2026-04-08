@@ -1,0 +1,470 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { ChangerawrMarkdown, createEngine, AlertExtension } from '@changerawr/markdown';
+
+const faqFiles = import.meta.glob('../content/faq/*.md', { eager: true });
+const rawFaqFiles = import.meta.glob('../content/faq/*.md', { eager: true, query: '?raw' });
+
+const engine = createEngine({
+  renderer: {
+    format: 'tailwind',
+    sanitize: false,
+    allowUnsafeHtml: true,
+    customClasses: {
+      'h1': 'md-h1',
+      'h2': 'md-h2',
+      'h3': 'md-h3',
+      'p': 'md-p',
+      'heading-1': 'md-h1',
+      'heading-2': 'md-h2',
+      'heading-3': 'md-h3',
+      'paragraph': 'md-p',
+      'blockquote': 'md-quote',
+      'link': 'md-link',
+      'list': 'md-list',
+      'list-item': 'md-li',
+      'horizontal-rule': 'md-hr',
+      'code-inline': 'md-code-inline',
+      'code-block': 'md-code-block',
+      'alert': 'md-alert',
+      'alert-info': 'md-alert-info',
+      'alert-warning': 'md-alert-warning',
+      'alert-error': 'md-alert-error',
+      'alert-success': 'md-alert-success'
+    } as any
+  }
+} as any);
+
+const faqs = Object.entries(faqFiles).map(([path, file]: [string, any]) => {
+  const id = path.split('/').pop()?.replace('.md', '') || path;
+  const rawContent = (rawFaqFiles[path] as any).default;
+  const contentOnly = rawContent.replace(/^---[\s\S]*?---/, '');
+  const renderedHtml = engine.toHtml(contentOnly);
+  return {
+    id,
+    data: file.frontmatter,
+    html: renderedHtml
+  };
+});
+
+const sortedFaqs = faqs.sort((a, b) => (a.data.order || 0) - (b.data.order || 0));
+---
+
+<Layout title="Rated Layouts FAQ">
+  <div class="faq-page">
+    <h1 class="faq-header pusab-font">Rated Layouts FAQ</h1>
+
+    <div class="faq-container">
+      {sortedFaqs.length > 0 ? (
+        <>
+          <!-- Sidebar -->
+          <div class="faq-sidebar-wrapper">
+            <div class="faq-sidebar">
+              {sortedFaqs.map((faq, index) => (
+                <div
+                  class={`category-cell ${index === 0 ? 'active' : ''}`}
+                  data-target={faq.id}
+                >
+                  <span class="category-name pusab-font">{faq.data.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- Main Content -->
+          <div class="faq-main-wrapper">
+            <div class="faq-main-panel">
+              <div class="panel-header">
+                <h2 class="panel-title pusab-font" id="content-title">{sortedFaqs[0].data.title.toUpperCase()}</h2>
+              </div>
+              <div class="panel-body" id="content-body">
+                {sortedFaqs.map((faq, index) => (
+                  <div
+                    class={`faq-section ${index === 0 ? 'active' : ''}`}
+                    id={`section-${faq.id}`}
+                    style={index === 0 ? "" : "display: none;"}
+                  >
+                    <div class="markdown-content" set:html={faq.html} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div class="no-content">
+          <p class="pusab-font">No FAQ entries found in src/content/faq/</p>
+          <p>Please check if the files exist in the correct directory.</p>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <script>
+    const cells = document.querySelectorAll('.category-cell');
+    const sections = document.querySelectorAll('.faq-section');
+    const titleElement = document.getElementById('content-title');
+
+    cells.forEach(cell => {
+      cell.addEventListener('click', () => {
+        const targetId = cell.getAttribute('data-target');
+
+        cells.forEach(c => c.classList.remove('active'));
+        cell.classList.add('active');
+
+        sections.forEach(section => {
+          if (section.id === `section-${targetId}`) {
+            (section as HTMLElement).style.display = 'block';
+            section.classList.add('active');
+          } else {
+            (section as HTMLElement).style.display = 'none';
+            section.classList.remove('active');
+          }
+        });
+
+        if (titleElement) {
+          titleElement.textContent = (cell.querySelector('.category-name')?.textContent || '').toUpperCase();
+        }
+      });
+    });
+  </script>
+</Layout>
+
+<style>
+  .faq-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .faq-header {
+    font-size: 3rem;
+    color: white;
+    margin-bottom: 3rem;
+    text-align: center;
+    -webkit-text-stroke: 2px black;
+  }
+
+  .faq-container {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .faq-sidebar-wrapper {
+    width: 320px;
+    flex-shrink: 0;
+  }
+
+  .faq-sidebar {
+    background: rgba(0, 0, 0, 0.4);
+    border: 6px solid #4cbdff;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(76, 189, 255, 0.2);
+  }
+
+  .category-cell {
+    background: linear-gradient(to bottom, #44e0e2, #186fd2);
+    border: 3px solid #000;
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.1s;
+    cursor: pointer;
+    box-shadow:
+      inset 0 -4px 0 rgba(0, 0, 0, 0.4),
+      0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .category-cell.active {
+    filter: brightness(1.2);
+    border-color: white;
+  }
+
+  .category-cell:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+  }
+
+  .category-name {
+    color: white;
+    font-size: 1.3rem;
+    text-shadow: 2px 2px #000;
+    flex-grow: 1;
+    -webkit-text-stroke: 1px black;
+  }
+
+  .faq-main-wrapper {
+    flex-grow: 1;
+  }
+
+  .faq-main-panel {
+    background: linear-gradient(to bottom, #103b70, #081d38);
+    border: 4px solid #4cbdff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .panel-header {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 4px solid #4cbdff;
+  }
+
+  .panel-title {
+    font-size: 2.5rem;
+    text-align: center;
+  }
+
+  .panel-body {
+    padding: 0.5rem 3rem 3rem;
+    color: white;
+    font-family: var(--font-main);
+    font-size: 1.2rem;
+    line-height: 1.7;
+    text-align: left;
+  }
+
+  /* Pretty Markdown elements */
+  .markdown-content {
+    width: 100%;
+  }
+
+  .md-p, .md-li, .md-quote {
+    white-space: pre-wrap !important;
+  }
+
+  .md-p {
+    margin-top: 0 !important;
+    margin-bottom: 0.75rem !important;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.15rem;
+  }
+
+  .md-h1 {
+    font-size: 2.8rem;
+    margin: 0 0 0.5rem 0 !important;
+    color: #ffffff;
+    font-family: var(--font-heading);
+    -webkit-text-stroke: 2px black;
+    text-shadow: 4px 4px 0px #000;
+    display: block !important;
+    text-align: center !important;
+    white-space: normal !important;
+    line-height: 1.1 !important;
+  }
+
+  .md-h1 *, .md-h2 *, .md-h3 * {
+    white-space: normal !important;
+    display: inline !important;
+  }
+
+  .md-h2 {
+    font-size: 2.2rem;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.3rem !important;
+    color: #4cbdff;
+    font-family: var(--font-heading);
+    -webkit-text-stroke: 1.5px black;
+    text-shadow: 3px 3px 0px #000;
+    display: block !important;
+    white-space: normal !important;
+    line-height: 1.1 !important;
+  }
+
+  .md-h3 {
+    font-size: 1.8rem;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.2rem !important;
+    color: #4cbdff;
+    font-family: var(--font-heading);
+    -webkit-text-stroke: 1px black;
+    text-shadow: 2px 2px 0px #000;
+    display: block !important;
+    white-space: normal !important;
+    line-height: 1.1 !important;
+  }
+
+  .md-quote {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    border-left: 8px solid #4cbdff;
+    margin: 2rem 0;
+    font-style: italic;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+
+  .md-hr {
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #4cbdff, transparent);
+    margin: 3rem 0;
+    border: none;
+    opacity: 0.6;
+  }
+
+  .md-link {
+    color: #4cbdff;
+    font-weight: bold;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: all 0.2s;
+  }
+
+  .md-link:hover {
+    color: white;
+    text-shadow: 0 0 10px #4cbdff;
+  }
+
+  .md-list {
+    margin: 1.5rem 0;
+    padding-left: 1.5rem;
+    list-style-type: disc;
+  }
+
+  .md-li {
+    margin-bottom: 0.8rem;
+    padding-left: 0.5rem;
+    line-height: 1.6;
+    white-space: pre-wrap !important;
+  }
+
+  .md-code-inline {
+    background: rgba(0, 0, 0, 0.5);
+    color: #4cbdff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.95em;
+    border: 1px solid rgba(76, 189, 255, 0.3);
+  }
+
+  .md-code-block {
+    background: #0a0a0a;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #4cbdff;
+    font-family: monospace;
+    overflow-x: auto;
+    margin: 2rem 0;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    line-height: 1.4;
+  }
+
+  /* Alert styles - Targeted by role and library classes for maximum robustness */
+  .markdown-content :global([role="alert"]),
+  .md-alert {
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    margin: 2.5rem 0 !important;
+    border: 3px solid #000 !important;
+    border-left: 10px solid #4cbdff !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    font-weight: 500 !important;
+    display: block !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Info / Tip */
+  .markdown-content :global([role="alert"][class*="blue"]),
+  .markdown-content :global([role="alert"].bg-blue-500\/10),
+  .md-alert-info {
+    background: linear-gradient(135deg, #1e40af, #1e3a8a) !important;
+    border-color: #60a5fa !important;
+    border-left-color: #60a5fa !important;
+  }
+
+  /* Warning */
+  .markdown-content :global([role="alert"][class*="yellow"]),
+  .markdown-content :global([role="alert"][class*="amber"]),
+  .md-alert-warning {
+    background: linear-gradient(135deg, #92400e, #78350f) !important;
+    border-color: #fbbf24 !important;
+    border-left-color: #fbbf24 !important;
+  }
+
+  /* Error */
+  .markdown-content :global([role="alert"][class*="red"]),
+  .md-alert-error {
+    background: linear-gradient(135deg, #991b1b, #7f1d1d) !important;
+    border-color: #f87171 !important;
+    border-left-color: #f87171 !important;
+  }
+
+  /* Success */
+  .markdown-content :global([role="alert"][class*="green"]),
+  .md-alert-success {
+    background: linear-gradient(135deg, #166534, #14532d) !important;
+    border-color: #4ade80 !important;
+    border-left-color: #4ade80 !important;
+  }
+
+  .no-content {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 4px dashed #4cbdff;
+    border-radius: 16px;
+    padding: 4rem;
+    text-align: center;
+    color: white;
+  }
+
+  /* Hide auto-generated header anchors that create gaps */
+  .markdown-content :global(a[aria-hidden="true"]),
+  .markdown-content :global(a.anchor),
+  .markdown-content :global(.anchor),
+  .markdown-content :global(a[href^="#"]) {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    visibility: hidden !important;
+  }
+
+  .no-content p {
+    margin: 1rem 0;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 900px) {
+    .faq-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    .faq-sidebar-wrapper {
+      width: 100%;
+    }
+    .faq-header {
+      font-size: 2.2rem;
+    }
+    .panel-header {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+  }
+</style>

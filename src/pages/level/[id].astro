@@ -1,0 +1,455 @@
+---
+export const prerender = false;
+import Layout from "../../layouts/Layout.astro";
+
+const { id } = Astro.params;
+const levelId = parseInt(id || "");
+
+if (isNaN(levelId)) {
+  return Astro.redirect("/");
+}
+
+// Fetch Level Data
+const levelRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getLevel", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ levelId }),
+});
+
+if (!levelRes.ok) {
+  return Astro.redirect("/404");
+}
+
+const level = await levelRes.json();
+
+// Fetch Sends Data
+const sendsRes = await fetch(
+  `https://gdrate.arcticwoof.xyz/v1/getLevelSends?levelId=${levelId}`,
+);
+const sends = sendsRes.ok ? await sendsRes.json() : { sends: [] };
+
+// Fetch Votes Data
+const votesRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getVotes", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ levelId }),
+});
+const votes = votesRes.ok ? await votesRes.json() : { votes: [] };
+
+const getDifficultyPath = (diffValue: number, featValue: number) => {
+  let diffName = "NA";
+  let fileName = "NA";
+
+  if (diffValue === 1) {
+    diffName = "AUTO";
+    fileName = "auto";
+  } else if (diffValue === 2) {
+    diffName = "EASY";
+    fileName = "easy";
+  } else if (diffValue === 3) {
+    diffName = "NORMAL";
+    fileName = "normal";
+  } else if (diffValue >= 4 && diffValue <= 5) {
+    diffName = "HARD";
+    fileName = "hard";
+  } else if (diffValue >= 6 && diffValue <= 7) {
+    diffName = "HARDER";
+    fileName = "harder";
+  } else if (diffValue >= 8 && diffValue <= 9) {
+    diffName = "INSANE";
+    fileName = "insane";
+  } else if (diffValue === 10) {
+    diffName = "EASY DEMON";
+    fileName = "easydemon";
+  } else if (diffValue === 15) {
+    diffName = "MEDIUM DEMON";
+    fileName = "mediumdemon";
+  } else if (diffValue === 20) {
+    diffName = "HARD DEMON";
+    fileName = "harddemon";
+  } else if (diffValue === 25) {
+    diffName = "INSANE DEMON";
+    fileName = "insanedemon";
+  } else if (diffValue === 30) {
+    diffName = "EXTREME DEMON";
+    fileName = "extremedemon";
+  }
+
+  let featName = "no";
+  if (featValue === 1) featName = "featured";
+  else if (featValue === 2) featName = "epic";
+  else if (featValue === 3) featName = "legendary";
+
+  return `/difficulty/${diffName}/${fileName}_${featName}.png`;
+};
+
+const getDifficultyName = (diffValue: number) => {
+  const names: Record<number, string> = {
+    1: "Auto",
+    2: "Easy",
+    3: "Normal",
+    4: "Hard",
+    5: "Hard",
+    6: "Harder",
+    7: "Harder",
+    8: "Insane",
+    9: "Insane",
+    10: "Easy Demon",
+    15: "Medium Demon",
+    20: "Hard Demon",
+    25: "Insane Demon",
+    30: "Extreme Demon",
+  };
+  return names[diffValue] || "N/A";
+};
+
+const formatScore = (score: any) => {
+  const s = parseFloat(score);
+  return isNaN(s) ? "N/A" : s.toFixed(1);
+};
+---
+
+<Layout title={`${level.levelName} - Level Info`}>
+  <div class="level-page-container">
+    <div class="level-branding">
+      <div class="difficulty-hero">
+        <img
+          src={getDifficultyPath(level.difficulty, level.featured)}
+          alt="Difficulty"
+          class="hero-difficulty-icon"
+        />
+        <span class="difficulty-label pusab-font"
+          >{getDifficultyName(level.difficulty)}</span
+        >
+      </div>
+      <h1 class="level-title pusab-font">{level.levelName}</h1>
+      <a
+        href={`/profile/${level.creatorAccountId}`}
+        class="creator-link-wrapper"
+      >
+        <div class="creator-link-text pusab-font">
+          BY {level.creatorUsername}
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Info Panels Grid -->
+  <div class="panels-grid">
+    <!-- LEVEL INFO -->
+    <div class="info-panel">
+      <h3 class="panel-title pusab-font">LEVEL INFO</h3>
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <span class="stat-label pusab-font">Level ID</span>
+          <span class="stat-value pusab-font">{level.levelId}</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font">Difficulty</span>
+          <span class="stat-value pusab-font"
+            >{getDifficultyName(level.difficulty)}</span
+          >
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font gold-text">Featured Score</span>
+          <span class="stat-value pusab-font gold-text"
+            >{level.featuredScore}</span
+          >
+        </div>
+        {
+          (level.daily || level.weekly || level.monthly) && (
+            <div class="stat-tile">
+              <span class="stat-label pusab-font pink-text">
+                Special Status
+              </span>
+              <span class="stat-value pusab-font pink-text">
+                {level.daily ? "Daily" : level.weekly ? "Weekly" : "Monthly"}
+              </span>
+            </div>
+          )
+        }
+        <div class="stat-tile">
+          <span class="stat-label pusab-font">Game Type</span>
+          <div class="stat-value-with-icon pusab-font">
+            <img
+              src={level.type === "platformer"
+                ? "/stats/RL_planetMed.png"
+                : "/stats/RL_sparkMed.png"}
+              alt="Type"
+              height="20"
+            />
+            <span class="stat-value pusab-font"
+              >{level.type.charAt(0).toUpperCase() + level.type.slice(1)}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEND STATS -->
+    <div class="info-panel">
+      <h3 class="panel-title pusab-font">SEND STATS</h3>
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <span class="stat-label pusab-font">Total Suggestions</span>
+          <span class="stat-value pusab-font">{sends.suggestedTotal || 0}</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font gold-text">Featured Sends</span>
+          <span class="stat-value pusab-font gold-text"
+            >{sends.suggestedFeatured || 0}</span
+          >
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font cyan-text">Epic Sends</span>
+          <span class="stat-value pusab-font cyan-text"
+            >{sends.suggestedEpic || 0}</span
+          >
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font pink-text">Legendary Sends</span>
+          <span class="stat-value pusab-font pink-text"
+            >{sends.suggestedLegendary || 0}</span
+          >
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font red-text">Rejections</span>
+          <span class="stat-value pusab-font red-text"
+            >{sends.rejectedTotal || 0}</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- VOTE STATS (Full Width) -->
+    <div class="info-panel full-width">
+      <h3 class="panel-title pusab-font">VOTE STATS</h3>
+      <div class="votes-row">
+        <div class="stat-tile">
+          <span class="stat-label pusab-font">Total Votes</span>
+          <span class="stat-value pusab-font">{votes.totalVotes || 0}</span>
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font">Avg Gameplay</span>
+          <span class="stat-value pusab-font"
+            >{formatScore(votes.gameplayScore)}</span
+          >
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font">Avg Originality</span>
+          <span class="stat-value pusab-font"
+            >{formatScore(votes.originalityScore)}</span
+          >
+        </div>
+        <div class="stat-tile">
+          <span class="stat-label pusab-font">Avg Difficulty</span>
+          <span class="stat-value pusab-font"
+            >{formatScore(votes.difficultyScore)}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .level-page-container {
+    padding: 2rem 1rem;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* Header Section */
+  .header-section {
+    position: relative;
+    margin-bottom: 4rem;
+    text-align: center;
+  }
+
+  .back-link {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    text-decoration: none;
+    z-index: 10;
+  }
+
+  .back-button {
+    background: #5a3c1a;
+    border: 3px solid #000;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 0 #000;
+  }
+
+  .level-branding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .difficulty-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-difficulty-icon {
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+  }
+
+  .difficulty-label {
+    font-size: 1.2rem;
+    color: white;
+    text-shadow: 1px 1px #000;
+  }
+
+  .level-title {
+    font-size: 3.5rem;
+    margin: 0;
+    text-shadow: 1px 1px #000;
+    line-height: 1.1;
+  }
+
+  .creator-link-wrapper {
+    text-decoration: none;
+    transition: transform 0.1s;
+    display: inline-block;
+  }
+
+  .creator-link-wrapper:hover {
+    transform: scale(1.05);
+  }
+
+  .creator-link-text {
+    font-size: 1.8rem;
+    color: #ffc800;
+    text-shadow: 1px 1px #000;
+  }
+
+  /* Panels Grid */
+  .panels-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .info-panel {
+    background: linear-gradient(to bottom, #00d2ff 50%, #31ddfc 50%);
+    border: 4px solid #000;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    letter-spacing: 1px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+    padding-bottom: 0.8rem;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .stat-tile {
+    background: rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    color: white;
+    text-shadow: 1px 1px #000;
+  }
+
+  .stat-value-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px #000;
+  }
+
+  /* Vote Stats Row */
+  .votes-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+
+  /* Colors */
+  .gold-text {
+    color: #ffd966 !important;
+  }
+  .blue-text {
+    color: #4cbdff !important;
+  }
+  .cyan-text {
+    color: #00ffff !important;
+  }
+  .pink-text {
+    color: #ff00ff !important;
+  }
+  .red-text {
+    color: #ff4c4c !important;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .panels-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .votes-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .level-title {
+      font-size: 2.5rem;
+    }
+
+    .back-link {
+      position: relative;
+      margin-bottom: 1rem;
+      display: block;
+      top: 0;
+      transform: none;
+    }
+  }
+</style>

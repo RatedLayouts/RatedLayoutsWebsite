@@ -1,0 +1,400 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+
+const { searchParams } = Astro.url;
+const type = searchParams.get('type') || 'daily';
+
+let endpoint = 'https://gdrate.arcticwoof.xyz/v1/getDaily';
+if (type === 'weekly') endpoint = 'https://gdrate.arcticwoof.xyz/v1/getWeekly';
+if (type === 'monthly') endpoint = 'https://gdrate.arcticwoof.xyz/v1/getMonthly';
+
+const res = await fetch(endpoint, { cache: 'no-store' });
+const data = await res.json() || { layouts: [] };
+const layouts = data.layouts || [];
+
+function formatTime(seconds: number) {
+  if (seconds < 0) return "Ended";
+  
+  const d = Math.floor(seconds / (24 * 3600));
+  const h = Math.floor((seconds % (24 * 3600)) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+
+  let parts: string[] = [];
+  if (d > 0) parts.push(`${d}d`);
+  if (h > 0) parts.push(`${h}h`);
+  if (m > 0) parts.push(`${m}m`);
+
+  if (parts.length === 0) return "Ends in: <1m";
+
+  return `Ends in: ${parts.join(" ")}`;
+}
+
+const getDifficultyPath = (diffValue, featValue) => {
+  let diffName = "NA";
+  let fileName = "na";
+  
+  if (diffValue === 1) { diffName = "AUTO"; fileName = "auto"; }
+  else if (diffValue === 2) { diffName = "EASY"; fileName = "easy"; }
+  else if (diffValue === 3) { diffName = "NORMAL"; fileName = "normal"; }
+  else if (diffValue >= 4 && diffValue <= 5) { diffName = "HARD"; fileName = "hard"; }
+  else if (diffValue >= 6 && diffValue <= 7) { diffName = "HARDER"; fileName = "harder"; }
+  else if (diffValue >= 8 && diffValue <= 9) { diffName = "INSANE"; fileName = "insane"; }
+  else if (diffValue === 10) { diffName = "EASY DEMON"; fileName = "easydemon"; }
+  else if (diffValue === 15) { diffName = "MEDIUM DEMON"; fileName = "mediumdemon"; }
+  else if (diffValue === 20) { diffName = "HARD DEMON"; fileName = "harddemon"; }
+  else if (diffValue === 25) { diffName = "INSANE DEMON"; fileName = "insanedemon"; }
+  else if (diffValue === 30) { diffName = "EXTREME DEMON"; fileName = "extremedemon"; }
+  
+  let featName = "no";
+  if (featValue === 1) featName = "featured";
+  else if (featValue === 2) featName = "epic";
+  else if (featValue === 3) featName = "legendary";
+
+  return `/difficulty/${diffName}/${fileName}_${featName}.png`;
+};
+
+const getStars = (diffValue) => {
+  if (diffValue >= 10) return 10;
+  return diffValue;
+};
+---
+
+<Layout title={`Event - ${type.charAt(0).toUpperCase() + type.slice(1)}`}>
+  <div class="list-container">
+    <div class="header-row">
+      <h1 class="page-title pusab-font">{type.charAt(0).toUpperCase() + type.slice(1)} Layouts</h1>
+    </div>
+
+    <div class="events-container">
+      <div class="layouts-list">
+        {layouts.map((level) => (
+          <div class="event-item">
+            <div class="type-header-container">
+               <img 
+                 src={level.type === 'platformer' ? "/stats/RL_planetBig.png" : "/stats/RL_sparkBig.png"} 
+                 alt="Type Icon" 
+                 class="type-icon"
+               />
+               <h2 class="type-title pusab-font">{level.type === 'platformer' ? 'Platformer' : 'Classic'}</h2>
+            </div>
+            
+            <div class="level-cell">
+              <!-- Difficulty Face and Label -->
+              <div class="difficulty-container">
+                <img 
+                  src={getDifficultyPath(level.difficulty, level.featured)} 
+                  alt="Difficulty" 
+                  class="difficulty-face"
+                />
+              </div>
+
+              <!-- Level Info -->
+              <div class="level-info">
+                <div class="name-row">
+                  <span class="level-name pusab-font">{level.levelName}</span>
+                  <span class="level-stars pusab-font">
+                    {getStars(level.difficulty)}
+                    <img src={level.type === 'platformer' ? "/stats/RL_planetMed.png" : "/stats/RL_sparkMed.png"} alt="Stars" class="stars-icon" />
+                  </span>
+                </div>
+                <div class="creator-row">
+                  <span class="by-label pusab-font">By</span>
+                  <a href={`/profile/${level.creatorAccountId}`} class="creator-link">
+                    <span class="creator-name pusab-font">{level.creatorUsername}</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              <div class="action-container">
+                <div class="featured-score">
+                  <span class="score-label">Featured Score:</span>
+                  <span class="score-value">{level.featuredScore}</span>
+                </div>
+                <a href={`/level/${level.levelId}`} class="view-button-link">
+                  <button class="view-button pusab-font">VIEW</button>
+                </a>
+              </div>
+            </div>
+
+            <div class="timer-footer-container">
+               <span class="timer-text pusab-font">{formatTime(level.timeLeft)}</span>
+            </div>
+          </div>
+        ))}
+        {layouts.length === 0 && (
+          <div class="empty-state pusab-font">
+            No active {type} event found.
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .list-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2.8rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin: 0;
+  }
+
+  .tabs-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(to bottom, #4a4a4a, #2a2a2a);
+    border: 3px solid #000;
+    border-radius: 6px;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    font-size: 1.2rem;
+    text-decoration: none;
+    text-shadow: 1px 1px #000;
+    transition: all 0.1s;
+    box-shadow: 0 4px 0 #000;
+  }
+
+  .tab-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .tab-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+  }
+
+  .event-item {
+    margin-bottom: 3rem;
+  }
+
+  .type-header-container {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.4rem 1.5rem;
+    margin-bottom: 1rem;
+    width: fit-content;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+
+  .type-icon {
+    width: 40px;
+    height: auto;
+  }
+
+  .type-title {
+    font-size: 1.6rem;
+    margin: 0;
+    text-shadow: 2px 2px #000;
+  }
+
+  .timer-footer-container {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0 0 10px 10px;
+    padding: 0.5rem 2rem;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: 2rem;
+    position: relative;
+    z-index: 0;
+  }
+
+  .timer-text {
+    font-size: 1rem;
+    text-shadow: 1px 1px #000;
+  }
+
+  .layouts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .level-cell {
+    background: linear-gradient(to bottom, #d2b48c 50%, #bc9b6a 50%);
+    border: 4px solid #000;
+    border-radius: 12px;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .difficulty-container {
+    margin-right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+  }
+
+  .difficulty-face {
+    width: 100px;
+    height: auto;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+  }
+
+  .level-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+  }
+
+  .name-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .level-name {
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    color: white;
+    text-shadow: 2px 2px #000;
+  }
+
+  .level-stars {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 1.8rem;
+    color: white;
+    text-shadow: 2px 2px #000;
+  }
+
+  .stars-icon {
+    width: 24px;
+    height: auto;
+  }
+
+  .creator-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .by-label {
+    color: #ffc800;
+    font-size: 1.5rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .creator-name {
+    color: #ffc800;
+    font-size: 1.5rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .creator-link {
+    text-decoration: none;
+    transition: transform 0.1s;
+    display: inline-block;
+  }
+
+  .creator-link:hover {
+    transform: scale(1.05);
+  }
+
+  .action-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 80px;
+  }
+
+  .featured-score {
+    font-family: inherit;
+    font-size: 1rem;
+    text-shadow: 1px 1px #000;
+  }
+
+  .score-value {
+    margin-left: 0.2rem;
+  }
+
+  .view-button {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+    border: 3px solid #000;
+    border-radius: 6px;
+    color: white;
+    padding: 0.4rem 1.2rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    text-shadow: 1px 1px #000;
+    box-shadow: 0 4px 0 #000;
+    transition: all 0.1s;
+  }
+
+  .view-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .view-button:hover {
+    transform: scale(1.05);
+  }
+
+  .empty-state {
+    padding: 3rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    border: 3px solid #000;
+    color: #ffc800;
+    font-size: 1.8rem;
+    text-align: center;
+    text-shadow: 2px 2px #000;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 768px) {
+    .level-cell {
+      flex-direction: column;
+      text-align: center;
+    }
+    .difficulty-container { margin: 0 0 1rem 0; }
+    .name-row, .creator-row { justify-content: center; }
+    .action-container { align-items: center; margin-top: 1rem; }
+  }
+</style>

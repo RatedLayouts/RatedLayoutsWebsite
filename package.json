@@ -1,32 +1,21 @@
 {
   "name": "rated-layouts-website",
-  "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "version": "0.0.1",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
-    "@vercel/analytics": "^1.6.1",
-    "gavatar": "^1.0.0",
-    "lucide-react": "^0.562.0",
-    "pixi.js": "^8.16.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.12.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "vite": "^7.2.4"
+    "@astrojs/node": "^10.0.4",
+    "@astrojs/svelte": "^8.0.4",
+    "@changerawr/markdown": "^1.1.11",
+    "astro": "^6.1.4",
+    "marked": "^18.0.0",
+    "svelte": "^5.55.1",
+    "typescript": "^6.0.2"
   }
 }
