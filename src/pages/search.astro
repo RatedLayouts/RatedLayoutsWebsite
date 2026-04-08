@@ -363,7 +363,9 @@ import Layout from "../layouts/Layout.astro";
           </div>
           <div class="creator-row">
             <span class="by-label pusab-font">By</span>
-            <span class="creator-name pusab-font">${level.creatorUsername}</span>
+            <a href="/profile/${level.creatorAccountId}" class="creator-link">
+              <span class="creator-name pusab-font">${level.creatorUsername}</span>
+            </a>
           </div>
         </div>
 
@@ -790,6 +792,16 @@ import Layout from "../layouts/Layout.astro";
     color: #ffc800;
     font-size: 1.5rem;
     text-shadow: 1.5px 1.5px #000;
+  }
+
+  .level-cell .creator-link {
+    text-decoration: none;
+    transition: transform 0.1s;
+    display: inline-block;
+  }
+
+  .level-cell .creator-link:hover {
+    transform: scale(1.05);
   }
 
   .level-cell .action-container {

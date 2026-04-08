@@ -123,7 +123,14 @@ const formatScore = (score: any) => {
         >
       </div>
       <h1 class="level-title pusab-font">{level.levelName}</h1>
-      <div class="creator-link pusab-font">BY {level.creatorUsername}</div>
+      <a
+        href={`/profile/${level.creatorAccountId}`}
+        class="creator-link-wrapper"
+      >
+        <div class="creator-link-text pusab-font">
+          BY {level.creatorUsername}
+        </div>
+      </a>
     </div>
   </div>
 
@@ -314,7 +321,17 @@ const formatScore = (score: any) => {
     line-height: 1.1;
   }
 
-  .creator-link {
+  .creator-link-wrapper {
+    text-decoration: none;
+    transition: transform 0.1s;
+    display: inline-block;
+  }
+
+  .creator-link-wrapper:hover {
+    transform: scale(1.05);
+  }
+
+  .creator-link-text {
     font-size: 1.8rem;
     color: #ffc800;
     text-shadow: 1px 1px #000;

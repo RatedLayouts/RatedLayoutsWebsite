@@ -73,7 +73,9 @@ const getStars = (diffValue) => {
                   </div>
                   <div class="creator-row">
                     <span class="by-label pusab-font">By</span>
-                    <span class="creator-name pusab-font">{level.creatorUsername}</span>
+                    <a href={`/profile/${level.creatorAccountId}`} class="creator-link">
+                      <span class="creator-name pusab-font">{level.creatorUsername}</span>
+                    </a>
                   </div>
                 </div>
 
@@ -219,6 +221,16 @@ const getStars = (diffValue) => {
     color: #ffc800;
     font-size: 1.6rem;
     text-shadow: 1.5px 1.5px #000;
+  }
+
+  .creator-link {
+    text-decoration: none;
+    transition: transform 0.1s;
+    display: inline-block;
+  }
+
+  .creator-link:hover {
+    transform: scale(1.05);
   }
 
   .action-container {
