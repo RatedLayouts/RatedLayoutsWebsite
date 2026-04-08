@@ -16,6 +16,6 @@
     "astro": "^6.1.4",
     "marked": "^18.0.0",
     "svelte": "^5.55.1",
-    "typescript": "^6.0.2"
+    "typescript": "^5.7.3"
   }
 }
