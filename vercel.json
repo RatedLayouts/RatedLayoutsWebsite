@@ -5,6 +5,10 @@
       "destination": "https://gdrate.arcticwoof.xyz/v1/:match*"
     },
     {
+      "source": "/api/:match*",
+      "destination": "https://gdrate.arcticwoof.xyz/:match*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

@@ -5,10 +5,7 @@ import node from '@astrojs/node';
 // https://astro.build/config
 export default defineConfig({
   integrations: [svelte()],
-  output: 'hybrid',
-  adapter: node({
-    mode: 'standalone'
-  }),
+  output: 'static',
   vite: {
     server: {
       proxy: {
@@ -16,6 +13,12 @@ export default defineConfig({
           target: 'https://gdrate.arcticwoof.xyz',
           changeOrigin: true,
           secure: false,
+        },
+        '/api': {
+          target: 'https://gdrate.arcticwoof.xyz',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/api/, ''),
         },
         '/gd-api': {
           target: 'http://www.boomlings.com/database',
