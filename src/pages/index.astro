@@ -33,23 +33,26 @@ import Layout from "../layouts/Layout.astro";
     </a>
   </div>
   <div class="secondary-menu">
-    <a href="#" class="small-button" id="credits-btn">
+    <a class="small-button" id="credits-btn">
       <img src="/buttons/RL_credits01.png" alt="Credits" />
     </a>
     <a class="small-button" id="news-btn">
       <img src="/buttons/RL_news01.png" alt="News" />
     </a>
-    <a href="#" class="small-button">
+    <a href="/faq" class="small-button">
       <img src="/buttons/RL_info01.png" alt="Info" />
     </a>
-    <a class="small-button" id="random-btn">
-      <img src="/buttons/RL_random01.png" alt="Random" />
+    <a class="small-button disabled">
+      <img src="/buttons/RL_demonList01.png" alt="Demon List" />
     </a>
     <a
       href="https://geode-sdk.org/mods/arcticwoof.rated_layouts"
       class="small-button"
     >
       <img src="/buttons/RL_geode01.png" alt="Geode" />
+    </a>
+    <a class="small-button" id="random-btn">
+      <img src="/buttons/RL_random01.png" alt="Random" />
     </a>
     <a href="https://discord.gg/jBf2wfBgVT" class="small-button">
       <img src="/buttons/RL_discord01.png" alt="Discord" />
@@ -112,6 +115,16 @@ import Layout from "../layouts/Layout.astro";
 
   .small-button:active {
     transform: scale(0.9);
+  }
+
+  .small-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+  }
+
+  .small-button.disabled:hover {
+    transform: none;
   }
 
   .small-button img {
