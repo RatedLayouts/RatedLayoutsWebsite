@@ -6,7 +6,7 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   integrations: [svelte()],
   adapter: vercel(),
-  output: 'hybrid',
+  output: 'static',
   vite: {
     server: {
       proxy: {
@@ -35,5 +35,5 @@ export default defineConfig({
     },
   },
 });
- 
- 
+
+
