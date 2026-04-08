@@ -24,7 +24,7 @@ All of these questions relating to its ratings are based of **Classic** layouts,
 :::
 
 :::success Advice
-If you need an advice on making good layouts, go check out [Soku's Beginner Layout Tips](https://gdgp.miraheze.org/wiki/User:Sokuto/Beginner_layout_tips)
+If you need an advice on making **good layouts**, go check out [Soku's Beginner Layout Tips](https://gdgp.miraheze.org/wiki/User:Sokuto/Beginner_layout_tips)
 :::
 
 > All FAQ are written by Soku and Qou.
