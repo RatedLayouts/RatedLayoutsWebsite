@@ -9,9 +9,16 @@ let endpoint = 'https://gdrate.arcticwoof.xyz/v1/getDaily';
 if (type === 'weekly') endpoint = 'https://gdrate.arcticwoof.xyz/v1/getWeekly';
 if (type === 'monthly') endpoint = 'https://gdrate.arcticwoof.xyz/v1/getMonthly';
 
-const res = await fetch(endpoint, { cache: 'no-store' });
-const data = await res.json() || { layouts: [] };
-const layouts = data.layouts || [];
+let layouts = [];
+try {
+  const res = await fetch(endpoint, { cache: 'no-store' });
+  if (res.ok) {
+    const data = await res.json() || { layouts: [] };
+    layouts = data.layouts || [];
+  }
+} catch (e) {
+  console.error("Failed to fetch events:", e);
+}
 
 function formatTime(seconds: number) {
   if (seconds < 0) return "Ended";

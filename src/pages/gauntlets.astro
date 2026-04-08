@@ -2,10 +2,17 @@
 export const prerender = false;
 import Layout from '../layouts/Layout.astro';
 
-const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getGauntlets`, {
-  cache: 'no-store'
-});
-const gauntlets = await res.json() || [];
+let gauntlets = [];
+try {
+  const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getGauntlets`, {
+    cache: 'no-store'
+  });
+  if (res.ok) {
+    gauntlets = await res.json() || [];
+  }
+} catch (e) {
+  console.error("Failed to fetch gauntlets:", e);
+}
 
 // Helper function to parse GD markdown description
 function parseDescription(desc) {
@@ -115,6 +122,17 @@ function parseDescription(desc) {
     font-size: 2.5rem;
     text-shadow: 2.5px 2.5px #00000050;
     margin: 0;
+  }
+
+  @media (max-width: 600px) {
+    .page-title {
+      font-size: 1.8rem;
+    }
+    .gauntlet-cell {
+        width: 100% !important;
+        max-width: 320px;
+        padding: 1.5rem 1rem !important;
+    }
   }
 
   .gauntlets-list {

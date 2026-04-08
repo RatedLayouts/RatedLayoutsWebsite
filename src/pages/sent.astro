@@ -277,6 +277,23 @@ const getDifficultyPath = (diffValue: number, featValue: number) => {
     border: 2px solid rgba(255, 255, 255, 0.1);
     margin: 0 auto 2rem auto;
     width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 600px) {
+    .search-form {
+      flex-direction: column;
+      padding: 1rem;
+      gap: 1rem;
+    }
+    .search-select, .search-input, .search-btn {
+      width: 100%;
+    }
+    .header-row {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
   }
 
   .search-select {

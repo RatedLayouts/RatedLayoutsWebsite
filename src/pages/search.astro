@@ -295,6 +295,11 @@ import Layout from "../layouts/Layout.astro";
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
+
       const data = await res.json();
       const layouts = data.layouts || [];
       const totalAmount = data.totalAmount || 0;
@@ -443,6 +448,15 @@ import Layout from "../layouts/Layout.astro";
     font-size: 2.5rem;
   }
 
+  @media (max-width: 600px) {
+    .page-title {
+      font-size: 2rem;
+    }
+    .search-panel {
+      padding: 1.5rem;
+    }
+  }
+
   /* Panel Styling */
   .search-panel {
     background: rgba(0, 0, 0, 0.4);
@@ -456,8 +470,16 @@ import Layout from "../layouts/Layout.astro";
 
   .panel-section {
     display: flex;
+    flex-direction: row;
     gap: 2rem;
     margin-bottom: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .panel-section {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
   }
 
   .grid-section {
@@ -466,11 +488,30 @@ import Layout from "../layouts/Layout.astro";
     gap: 1.5rem;
   }
 
+  @media (max-width: 900px) {
+    .grid-section {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 500px) {
+    .grid-section {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .grid-section-three {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .grid-section-three {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
   }
 
   .input-group {
@@ -663,6 +704,26 @@ import Layout from "../layouts/Layout.astro";
     border: 3px solid rgba(0, 0, 0, 0.5);
     margin: 1rem 0;
     width: 100%;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 950px) {
+    .difficulty-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 500px) {
+    .difficulty-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .difficulty-item {
+      width: 100% !important;
+      height: auto !important;
+      padding: 1.5rem 0.5rem !important;
+    }
   }
 
   .difficulty-item {

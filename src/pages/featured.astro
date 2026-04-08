@@ -5,14 +5,25 @@ import Layout from '../layouts/Layout.astro';
 const { searchParams } = Astro.url;
 const page = parseInt(searchParams.get('page') || '1');
 
-const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getFeatured?page=${page}`, {
-  cache: 'no-store'
-});
-const data = await res.json();
-const layouts = data.layouts || [];
-const totalAmount = data.totalAmount || 0;
-const amountPerPage = data.amount || 10;
-const totalPages = Math.ceil(totalAmount / amountPerPage);
+let layouts = [];
+let totalAmount = 0;
+let amountPerPage = 10;
+let totalPages = 1;
+
+try {
+  const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getFeatured?page=${page}`, {
+    cache: 'no-store'
+  });
+  if (res.ok) {
+    const data = await res.json();
+    layouts = data.layouts || [];
+    totalAmount = data.totalAmount || 0;
+    amountPerPage = data.amount || 10;
+    totalPages = Math.ceil(totalAmount / amountPerPage);
+  }
+} catch (e) {
+  console.error("Failed to fetch featured levels:", e);
+}
 
 const getDifficultyPath = (diffValue, featValue) => {
   let diffName = "NA";
@@ -121,6 +132,14 @@ const getDifficultyPath = (diffValue, featValue) => {
     align-items: center;
     margin-bottom: 2rem;
     position: relative;
+    gap: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .header-row {
+      flex-direction: column;
+      text-align: center;
+    }
   }
 
   .page-title {
@@ -129,13 +148,23 @@ const getDifficultyPath = (diffValue, featValue) => {
     margin: 0;
   }
 
+  @media (max-width: 600px) {
+    .page-title {
+      font-size: 2rem;
+    }
+    .stats-counter {
+      width: 100%;
+      text-align: center;
+    }
+  }
+
   .stats-counter {
     background: rgba(0, 0, 0, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 0.5rem 1rem;
-    text-align: right;
     color: #ffd966;
+    text-align: right;
     text-shadow: 2.5px 2.5px #00000050;
   }
 

@@ -15,8 +15,15 @@ interface Props {
 }
 
 export async function getStaticPaths() {
-  const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getGauntlets`);
-  const gauntlets = (await res.json() || []) as Gauntlet[];
+  let gauntlets: Gauntlet[] = [];
+  try {
+    const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getGauntlets`);
+    if (res.ok) {
+      gauntlets = (await res.json() || []) as Gauntlet[];
+    }
+  } catch (e) {
+    console.error("Failed to fetch gauntlets for static paths:", e);
+  }
   
   return gauntlets.map((g, index) => ({
     params: { id: g.gauntletId.toString() },
@@ -153,6 +160,21 @@ const getDifficultyPath = (diffValue, featValue) => {
     align-items: center;
     margin-bottom: 2rem;
     position: relative;
+    gap: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .header-row {
+      flex-direction: column;
+      text-align: center;
+    }
+    .stats-counter {
+        width: 100%;
+        text-align: center;
+    }
+    .page-title {
+        font-size: 2rem;
+    }
   }
 
   .page-title {

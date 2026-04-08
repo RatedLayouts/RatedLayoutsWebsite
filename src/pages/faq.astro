@@ -149,6 +149,16 @@ const sortedFaqs = faqs.sort((a, b) => (a.data.order || 0) - (b.data.order || 0)
     text-align: center;
   }
 
+  @media (max-width: 600px) {
+    .faq-header {
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .faq-container {
+      gap: 1.5rem;
+    }
+  }
+
   .faq-container {
     display: flex;
     gap: 2rem;
@@ -232,6 +242,18 @@ const sortedFaqs = faqs.sort((a, b) => (a.data.order || 0) - (b.data.order || 0)
     text-align: center;
   }
 
+  @media (max-width: 600px) {
+    .panel-header {
+      padding: 1rem;
+    }
+    .panel-title {
+      font-size: 1.8rem;
+    }
+    .panel-body {
+      padding: 1rem 1.5rem 2rem;
+    }
+  }
+
   .panel-body {
     padding: 0.5rem 3rem 3rem;
     color: white;
@@ -269,6 +291,13 @@ const sortedFaqs = faqs.sort((a, b) => (a.data.order || 0) - (b.data.order || 0)
     text-align: center !important;
     white-space: normal !important;
     line-height: 1.1 !important;
+  }
+
+  @media (max-width: 600px) {
+    .md-h1 { font-size: 2rem; }
+    .md-h2 { font-size: 1.6rem; }
+    .md-h3 { font-size: 1.3rem; }
+    .md-p { font-size: 1rem; }
   }
 
   .md-h1 *, .md-h2 *, .md-h3 * {

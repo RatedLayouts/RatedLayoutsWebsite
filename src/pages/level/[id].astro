@@ -9,32 +9,49 @@ if (isNaN(levelId)) {
   return Astro.redirect("/");
 }
 
-// Fetch Level Data
-const levelRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getLevel", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ levelId }),
-});
+let level: any = null;
+try {
+  const levelRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getLevel", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ levelId }),
+  });
 
-if (!levelRes.ok) {
+  if (!levelRes.ok) {
+    return Astro.redirect("/404");
+  }
+
+  level = await levelRes.json();
+} catch (e) {
+  console.error("Failed to fetch level details:", e);
   return Astro.redirect("/404");
 }
 
-const level = await levelRes.json();
+let sends: any = { sends: [], suggestedTotal: 0, suggestedFeatured: 0, suggestedEpic: 0, suggestedLegendary: 0, rejectedTotal: 0 };
+try {
+  const sendsRes = await fetch(
+    `https://gdrate.arcticwoof.xyz/v1/getLevelSends?levelId=${levelId}`,
+  );
+  if (sendsRes.ok) {
+    sends = await sendsRes.json();
+  }
+} catch (e) {
+  console.error("Failed to fetch sends:", e);
+}
 
-// Fetch Sends Data
-const sendsRes = await fetch(
-  `https://gdrate.arcticwoof.xyz/v1/getLevelSends?levelId=${levelId}`,
-);
-const sends = sendsRes.ok ? await sendsRes.json() : { sends: [] };
-
-// Fetch Votes Data
-const votesRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getVotes", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ levelId }),
-});
-const votes = votesRes.ok ? await votesRes.json() : { votes: [] };
+let votes: any = { votes: [], totalVotes: 0, gameplayScore: 0, originalityScore: 0, difficultyScore: 0 };
+try {
+  const votesRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getVotes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ levelId }),
+  });
+  if (votesRes.ok) {
+    votes = await votesRes.json();
+  }
+} catch (e) {
+  console.error("Failed to fetch votes:", e);
+}
 
 const getDifficultyPath = (diffValue: number, featValue: number) => {
   let diffName = "NA";

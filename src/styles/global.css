@@ -106,6 +106,18 @@ a {
   align-items: center;
 }
 
+@media (max-width: 600px) {
+  .navbar {
+    height: 60px;
+  }
+  .navbar-wrapper {
+    padding: 0 1rem;
+  }
+  #page-root {
+    padding-top: 60px !important;
+  }
+}
+
 .logo {
   display: flex;
   align-items: center;

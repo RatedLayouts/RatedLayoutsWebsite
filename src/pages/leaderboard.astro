@@ -6,15 +6,25 @@ const { searchParams } = Astro.url;
 const page = parseInt(searchParams.get('page') || '1');
 const type = parseInt(searchParams.get('type') || '1');
 
-// Fetch logic
-const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getLeaderboard?type=${type}&page=${page}`, {
-  cache: 'no-store'
-});
-const data = await res.json();
-const leaderboard = data.leaderboard || [];
-const totalAmount = data.total || 0;
-const amountPerPage = data.amount || 100;
-const totalPages = Math.ceil(totalAmount / amountPerPage);
+let leaderboard = [];
+let totalAmount = 0;
+let amountPerPage = 100;
+let totalPages = 1;
+
+try {
+  const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getLeaderboard?type=${type}&page=${page}`, {
+    cache: 'no-store'
+  });
+  if (res.ok) {
+    const data = await res.json();
+    leaderboard = data.leaderboard || [];
+    totalAmount = data.total || 0;
+    amountPerPage = data.amount || 100;
+    totalPages = Math.ceil(totalAmount / amountPerPage);
+  }
+} catch (e) {
+  console.error("Failed to fetch leaderboard:", e);
+}
 
 let statName = "";
 let statIcon = "";
@@ -36,6 +46,10 @@ if (type === 1) {
     statName = "Blue Coins";
     statIcon = "/stats/RL_BlueCoinSmall.png";
     statKey = "blueCoins";
+} else if (type === 5) {
+    statName = "Votes";
+    statIcon = "/stats/RL_commVote.png";
+    statKey = "votes";
 }
 ---
 
@@ -66,6 +80,10 @@ if (type === 1) {
       <a href="?type=4&page=1" class={`tab-btn ${type === 4 ? 'active' : ''}`}>
         <img src="/stats/RL_BlueCoinSmall.png" height="25px" width="auto" alt="Blue Coins" class="tab-icon" />
         <span class="tab-text pusab-font">Blue Coins</span>
+      </a>
+      <a href="?type=5&page=1" class={`tab-btn ${type === 5 ? 'active' : ''}`}>
+        <img src="/stats/RL_commVote.png" height="25px" width="auto" alt="Votes" class="tab-icon" />
+        <span class="tab-text pusab-font">Votes</span>
       </a>
     </div>
     
@@ -130,6 +148,7 @@ if (type === 1) {
     align-items: center;
     margin-bottom: 2rem;
     position: relative;
+    gap: 1rem;
   }
 
   .page-title {
@@ -158,12 +177,36 @@ if (type === 1) {
     color: white;
   }
 
+  @media (max-width: 600px) {
+    .header-row {
+      flex-direction: column;
+      text-align: center;
+    }
+    .stats-counter {
+      text-align: center;
+      width: 100%;
+    }
+  }
+
   .tabs-container {
     display: flex;
     justify-content: center;
     gap: 1rem;
     margin-bottom: 2rem;
     flex-wrap: wrap;
+    width: 100%;
+  }
+
+  @media (max-width: 500px) {
+    .tabs-container {
+      gap: 0.5rem;
+    }
+    .tab-btn {
+      padding: 0.5rem 0.8rem;
+      font-size: 1rem;
+      flex: 1 1 40%;
+      justify-content: center;
+    }
   }
 
   .tab-btn {
