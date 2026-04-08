@@ -1,9 +1,20 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 
+interface Gauntlet {
+  gauntletId: number;
+  gauntletName: string;
+  gauntletDescription: string;
+  layouts: any[];
+}
+
+interface Props {
+  gauntlet: Gauntlet;
+}
+
 export async function getStaticPaths() {
   const res = await fetch(`https://gdrate.arcticwoof.xyz/v1/getGauntlets`);
-  const gauntlets = await res.json() || [];
+  const gauntlets = (await res.json() || []) as Gauntlet[];
   
   return gauntlets.map(g => ({
     params: { id: g.gauntletId.toString() },
@@ -11,7 +22,7 @@ export async function getStaticPaths() {
   }));
 }
 
-const { gauntlet } = Astro.props;
+const { gauntlet } = Astro.props as Props;
 
 if (!gauntlet) {
   return Astro.redirect('/gauntlets');
