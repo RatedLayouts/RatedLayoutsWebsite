@@ -327,11 +327,6 @@ import Layout from "../layouts/Layout.astro";
     }
   });
 
-  function getStars(diffValue: number) {
-    if (diffValue >= 10) return 10;
-    return diffValue;
-  }
-
   function renderResults(layouts: any[]) {
     if (layouts.length === 0) {
       resultsList.innerHTML =
@@ -357,7 +352,7 @@ import Layout from "../layouts/Layout.astro";
           <div class="name-row">
             <span class="level-name pusab-font">${level.levelName}</span>
             <span class="level-stars pusab-font">
-              ${getStars(level.difficulty)}
+              ${level.difficulty}
               <img src="${level.type === "platformer" ? "/stats/RL_planetMed.png" : "/stats/RL_sparkMed.png"}" alt="Stars" class="stars-icon" />
             </span>
           </div>

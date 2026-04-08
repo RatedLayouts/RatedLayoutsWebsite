@@ -169,11 +169,6 @@ const getDifficultyPath = (diffValue: number, featValue: number) => {
   return `/difficulty/${diffName}/${fileName}_${featName}.png`;
 };
 
-const getStars = (diffValue: number) => {
-  if (diffValue >= 10) return 10;
-  return diffValue;
-};
-
 // Nameplate styling
 const nameplateStyle = profile.nameplate
   ? `background: url('https://gdrate.arcticwoof.xyz/nameplates/banner/nameplate_${profile.nameplate}.png') center/cover no-repeat;`
@@ -288,7 +283,7 @@ const nameplateStyle = profile.nameplate
                     <span class="mini-name pusab-font">{level.levelName}</span>
                     <div class="mini-stars">
                       <span class="star-count pusab-font">
-                        {getStars(level.difficulty)}
+                        {level.difficulty}
                       </span>
                       <img
                         src={

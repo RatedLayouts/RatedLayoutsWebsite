@@ -53,11 +53,6 @@ const getDifficultyPath = (diffValue, featValue) => {
 
   return `/difficulty/${diffName}/${fileName}_${featName}.png`;
 };
-
-const getStars = (diffValue) => {
-  if (diffValue >= 10) return 10;
-  return diffValue;
-};
 ---
 
 <Layout title={`Event - ${type.charAt(0).toUpperCase() + type.slice(1)}`}>
@@ -94,7 +89,7 @@ const getStars = (diffValue) => {
                 <div class="name-row">
                   <span class="level-name pusab-font">{level.levelName}</span>
                   <span class="level-stars pusab-font">
-                    {getStars(level.difficulty)}
+                    {level.difficulty}
                     <img src={level.type === 'platformer' ? "/stats/RL_planetMed.png" : "/stats/RL_sparkMed.png"} alt="Stars" class="stars-icon" />
                   </span>
                 </div>
