@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/node": "^10.0.4",
     "@astrojs/svelte": "^8.0.4",
+    "@astrojs/vercel": "^10.0.4",
     "@changerawr/markdown": "^1.1.11",
     "astro": "^6.1.4",
     "marked": "^18.0.0",
