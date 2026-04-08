@@ -58,5 +58,3 @@ We are not a private server, and we don't do "free rates" and "free moderator po
 ## Will there be mythic rating tier?
 
 **᠌No. Mythic is unnecessary**, since we already have fairly high standards for legendary. If we were to add mythic, only a few levels ever would have it, which is pointless.
-
----
