@@ -1,0 +1,649 @@
+---
+export const prerender = false;
+import Layout from "../../layouts/Layout.astro";
+
+const { accountId } = Astro.params;
+const id = parseInt(accountId || "");
+
+if (isNaN(id)) {
+  return Astro.redirect("/");
+}
+
+const { searchParams } = Astro.url;
+const ratedPage = parseInt(searchParams.get("ratedPage") || "1");
+const sentPage = parseInt(searchParams.get("sentPage") || "1");
+
+// Fetch Profile Data
+const profileRes = await fetch(
+  `https://gdrate.arcticwoof.xyz/v1/getProfile?accountId=${id}`,
+  {
+    cache: "no-store",
+  },
+);
+if (!profileRes.ok) {
+  return Astro.redirect("/");
+}
+const profile = await profileRes.json();
+
+// Fetch Rated Layouts
+const ratedRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getLayouts", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    username: profile.username,
+    page: ratedPage,
+  }),
+});
+const ratedData = (await ratedRes.json()) || {
+  layouts: [],
+  totalAmount: 0,
+  amount: 10,
+};
+const ratedLayouts = ratedData.layouts || [];
+const totalRated = ratedData.totalAmount || 0;
+const totalRatedPages = Math.ceil(totalRated / (ratedData.amount || 10));
+
+// Fetch Sent Layouts
+const sentRes = await fetch(
+  `https://gdrate.arcticwoof.xyz/v1/getSends?username=${profile.username}&page=${sentPage}`,
+  {
+    cache: "no-store",
+  },
+);
+const sentData = (await sentRes.json()) || {
+  layouts: [],
+  totalAmount: 0,
+  amount: 10,
+};
+const rawSentLayouts = sentData.layouts || [];
+const totalSent = sentData.totalAmount || 0;
+const totalSentPages = Math.ceil(totalSent / (sentData.amount || 10));
+
+// Fetch additional metadata for Sent Layouts from Boomlings
+let sentLayouts: any[] = [];
+if (rawSentLayouts.length > 0) {
+  const ids = rawSentLayouts.map((l) => l.levelId).join(",");
+  const body = new URLSearchParams({
+    secret: "Wmfd2893gb7",
+    type: "19",
+    str: ids,
+  });
+
+  try {
+    const gdRes = await fetch(
+      "http://www.boomlings.com/database/getGJLevels21.php",
+      {
+        method: "POST",
+        headers: { "User-Agent": "" },
+        body,
+      },
+    );
+
+    const gdText = await gdRes.text();
+    const parts = gdText.split("#");
+    const gdLevelsStr = parts[0] || "";
+
+    const levelMetadata = {};
+    gdLevelsStr.split("|").forEach((l) => {
+      const p = l.split(":");
+      const map = {};
+      for (let i = 0; i < p.length; i += 2) map[p[i]] = p[i + 1];
+      if (map[1]) {
+        levelMetadata[map[1]] = {
+          name: map[2] || "Unknown",
+          difficulty: parseInt(map[9]) || 0,
+          stars: parseInt(map[18]) || 0,
+          featured: parseInt(map[19]) || 0,
+          type: map[15] === "1" ? "platformer" : "classic",
+        };
+      }
+    });
+
+    sentLayouts = rawSentLayouts.map((l) => ({
+      ...l,
+      ...(levelMetadata[l.levelId] || { name: `Level ${l.levelId}` }),
+    }));
+  } catch (e) {
+    console.error("Failed to fetch sent layout metadata", e);
+    sentLayouts = rawSentLayouts.map((l) => ({
+      ...l,
+      name: `Level ${l.levelId}`,
+    }));
+  }
+}
+
+const badges: string[] = [];
+if (profile.isBooster) badges.push("/badge/RL_badgeBooster.png");
+if (profile.isSupporter) badges.push("/badge/RL_badgeSupporter.png");
+if (profile.isClassicMod) badges.push("/badge/RL_badgeMod01.png");
+if (profile.isClassicAdmin) badges.push("/badge/RL_badgeAdmin01.png");
+if (profile.isLeaderboardMod) badges.push("/badge/RL_badgelbMod01.png");
+if (profile.isLeaderboardAdmin) badges.push("/badge/RL_badgelbAdmin01.png");
+if (profile.isPlatMod) badges.push("/badge/RL_badgePlatMod01.png");
+if (profile.isPlatAdmin) badges.push("/badge/RL_badgePlatAdmin01.png");
+
+const getDifficultyPath = (diffValue: number, featValue: number) => {
+  let diffName = "NA";
+  let fileName = "NA";
+  if (diffValue === 1) {
+    diffName = "AUTO";
+    fileName = "auto";
+  } else if (diffValue === 2) {
+    diffName = "EASY";
+    fileName = "easy";
+  } else if (diffValue === 3) {
+    diffName = "NORMAL";
+    fileName = "normal";
+  } else if (diffValue >= 4 && diffValue <= 5) {
+    diffName = "HARD";
+    fileName = "hard";
+  } else if (diffValue >= 6 && diffValue <= 7) {
+    diffName = "HARDER";
+    fileName = "harder";
+  } else if (diffValue >= 8 && diffValue <= 9) {
+    diffName = "INSANE";
+    fileName = "insane";
+  } else if (diffValue === 10) {
+    diffName = "EASY DEMON";
+    fileName = "easydemon";
+  } else if (diffValue === 15) {
+    diffName = "MEDIUM DEMON";
+    fileName = "mediumdemon";
+  } else if (diffValue === 20) {
+    diffName = "HARD DEMON";
+    fileName = "harddemon";
+  } else if (diffValue === 25) {
+    diffName = "INSANE DEMON";
+    fileName = "insanedemon";
+  } else if (diffValue === 30) {
+    diffName = "EXTREME DEMON";
+    fileName = "extremedemon";
+  }
+
+  let featName = "no";
+  if (featValue === 1) featName = "featured";
+  else if (featValue === 2) featName = "epic";
+  else if (featValue === 3) featName = "legendary";
+
+  return `/difficulty/${diffName}/${fileName}_${featName}.png`;
+};
+
+const getStars = (diffValue: number) => {
+  if (diffValue >= 10) return 10;
+  return diffValue;
+};
+
+// Nameplate styling
+const nameplateStyle = profile.nameplate
+  ? `background: url('https://gdrate.arcticwoof.xyz/nameplates/banner/nameplate_${profile.nameplate}.png') center/cover no-repeat;`
+  : `background: linear-gradient(to bottom, #00d2ff 50%, #31ddfc 50%);`;
+---
+
+<Layout title={`${profile.username}'s Profile`}>
+  <div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header" style={nameplateStyle}>
+      <div class="header-overlay">
+        <div class="user-main">
+          <h1 class="username pusab-font">{profile.username}</h1>
+          <div class="badges-row">
+            {
+              badges.map((badge) => (
+                <img src={badge} alt="Badge" class="profile-badge" />
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="profile-stat-tile">
+        <img src="/stats/RL_sparkBig.png" alt="Sparks" class="stat-icon-big" />
+        <div class="stat-info">
+          <span class="stat-value pusab-font">{profile.sparks}</span>
+          <span class="stat-label pusab-font">Sparks</span>
+        </div>
+      </div>
+      <div class="profile-stat-tile">
+        <img
+          src="/stats/RL_planetBig.png"
+          alt="Planets"
+          class="stat-icon-big"
+        />
+        <div class="stat-info">
+          <span class="stat-value pusab-font">{profile.planets}</span>
+          <span class="stat-label pusab-font">Planets</span>
+        </div>
+      </div>
+      <div class="profile-stat-tile">
+        <img
+          src="/stats/RL_BlueCoinSmall.png"
+          alt="Blue Coins"
+          class="stat-icon-big"
+        />
+        <div class="stat-info">
+          <span class="stat-value pusab-font">{profile.blueCoins}</span>
+          <span class="stat-label pusab-font">Blue Coins</span>
+        </div>
+      </div>
+      <div class="profile-stat-tile">
+        <img src="/stats/RL_commVote.png" alt="Votes" class="stat-icon-big" />
+        <div class="stat-info">
+          <span class="stat-value pusab-font">{profile.votes}</span>
+          <span class="stat-label pusab-font">Votes</span>
+        </div>
+      </div>
+      <div class="profile-stat-tile">
+        <img
+          src="/stats/RL_blueprintPoint.png"
+          alt="Blueprint Points"
+          class="stat-icon-big"
+        />
+        <div class="stat-info">
+          <span class="stat-value pusab-font">{profile.creatorPoints}</span>
+          <span class="stat-label pusab-font">Blueprint</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layouts Sections -->
+    <div class="layouts-sections">
+      <!-- RATED LAYOUTS -->
+      <div class="section-panel">
+        <div class="section-header">
+          <h2 class="section-title pusab-font">Rated Layouts ({totalRated})</h2>
+          <div class="mini-pagination">
+            <a
+              href={`?ratedPage=${ratedPage - 1}&sentPage=${sentPage}`}
+              class={`mini-nav-btn ${ratedPage <= 1 ? "disabled" : ""}`}
+            >
+              <img src="/buttons/RL_prev01.png" alt="Prev" />
+            </a>
+            <span class="page-num pusab-font"
+              >{ratedPage}/{totalRatedPages || 1}</span
+            >
+            <a
+              href={`?ratedPage=${ratedPage + 1}&sentPage=${sentPage}`}
+              class={`mini-nav-btn ${ratedPage >= totalRatedPages ? "disabled" : ""}`}
+            >
+              <img src="/buttons/RL_next01.png" alt="Next" />
+            </a>
+          </div>
+        </div>
+
+        <div class="layouts-list-compact">
+          {
+            ratedLayouts.map((level) => (
+              <div class="level-cell-compact">
+                <div class="level-cell-main">
+                  <img
+                    src={getDifficultyPath(level.difficulty, level.featured)}
+                    alt="Diff"
+                    class="mini-diff"
+                  />
+                  <div class="mini-info">
+                    <span class="mini-name pusab-font">{level.levelName}</span>
+                    <div class="mini-stars">
+                      <span class="star-count pusab-font">
+                        {getStars(level.difficulty)}
+                      </span>
+                      <img
+                        src={
+                          level.type === "platformer"
+                            ? "/stats/RL_planetMed.png"
+                            : "/stats/RL_sparkMed.png"
+                        }
+                        alt="S"
+                        height="15"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <a
+                  href={`/level/${level.levelId}`}
+                  class="mini-view-btn pusab-font"
+                >
+                  VIEW
+                </a>
+              </div>
+            ))
+          }
+          {
+            ratedLayouts.length === 0 && (
+              <div class="empty-msg pusab-font">No rated layouts found.</div>
+            )
+          }
+        </div>
+      </div>
+
+      <!-- SENT LAYOUTS -->
+      <div class="section-panel">
+        <div class="section-header">
+          <h2 class="section-title pusab-font">Sent Layouts ({totalSent})</h2>
+          <div class="mini-pagination">
+            <a
+              href={`?ratedPage=${ratedPage}&sentPage=${sentPage - 1}`}
+              class={`mini-nav-btn ${sentPage <= 1 ? "disabled" : ""}`}
+            >
+              <img src="/buttons/RL_prev01.png" alt="Prev" />
+            </a>
+            <span class="page-num pusab-font"
+              >{sentPage}/{totalSentPages || 1}</span
+            >
+            <a
+              href={`?ratedPage=${ratedPage}&sentPage=${sentPage + 1}`}
+              class={`mini-nav-btn ${sentPage >= totalSentPages ? "disabled" : ""}`}
+            >
+              <img src="/buttons/RL_next01.png" alt="Next" />
+            </a>
+          </div>
+        </div>
+
+        <div class="layouts-list-compact">
+          {
+            sentLayouts.map((level) => (
+              <div class="level-cell-compact">
+                <div class="level-cell-main">
+                  {level.difficulty !== undefined ? (
+                    <img
+                      src={getDifficultyPath(
+                        level.difficulty,
+                        level.featured || 0,
+                      )}
+                      alt="Diff"
+                      class="mini-diff"
+                    />
+                  ) : (
+                    <div class="mini-diff-placeholder" />
+                  )}
+                  <div class="mini-info">
+                    <span class="mini-name pusab-font">
+                      {level.name || `Level ${level.levelId}`}
+                    </span>
+                    <div class="mini-stars">
+                      <span class="star-count pusab-font">
+                        {level.totalSuggests} Sends
+                      </span>
+                      {level.type && (
+                        <img
+                          src={
+                            level.type === "platformer"
+                              ? "/stats/RL_planetMed.png"
+                              : "/stats/RL_sparkMed.png"
+                          }
+                          alt="S"
+                          height="15"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+          {
+            sentLayouts.length === 0 && (
+              <div class="empty-msg pusab-font">No sent layouts found.</div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  /* Header */
+  .profile-header {
+    height: 180px;
+    border: 4px solid #000;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .header-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    padding: 0 3rem;
+  }
+
+  .user-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .username {
+    color: white;
+    font-size: 2.8rem;
+    margin: 0;
+    text-shadow: 2px 2px #000;
+  }
+
+  .badges-row {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .profile-badge {
+    height: 35px;
+    width: auto;
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.5));
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+    margin-bottom: 3rem;
+    max-width: 700px;
+    margin-inline: auto;
+  }
+
+  .profile-stat-tile:last-child:nth-child(odd) {
+    grid-column: span 2;
+    justify-content: center;
+  }
+
+  @media (max-width: 500px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    .profile-stat-tile:last-child:nth-child(odd) {
+      grid-column: span 1;
+    }
+  }
+
+  .profile-stat-tile {
+    background: linear-gradient(to bottom, #d2b48c 50%, #bc9b6a 50%);
+    border: 3px solid #000;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .stat-icon-big {
+    width: 45px;
+    height: auto;
+  }
+
+  .stat-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-value {
+    color: white;
+    font-size: 1.4rem;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+
+  /* Sections */
+  .layouts-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .section-panel {
+    background: rgba(0, 0, 0, 0.2);
+    border: 3px solid #000;
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+    padding-bottom: 0.8rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    color: #ffd966;
+    margin: 0;
+    text-shadow: 2px 2px #000;
+  }
+
+  .mini-pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .mini-nav-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+  }
+
+  .mini-nav-btn img {
+    width: 100%;
+    height: auto;
+  }
+
+  .mini-nav-btn:hover:not(.disabled) {
+    transform: scale(1.1);
+  }
+
+  .mini-nav-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    filter: grayscale(1);
+  }
+
+  .page-num {
+    font-size: 1.1rem;
+    color: white;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .layouts-list-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .level-cell-compact {
+    background: linear-gradient(to bottom, #d2b48c 50%, #bc9b6a 50%);
+    border: 2px solid #000;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .level-cell-main {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .mini-diff {
+    width: 40px;
+    height: auto;
+  }
+
+  .mini-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mini-name {
+    color: white;
+    font-size: 1rem;
+    text-shadow: 1px 1px #000;
+  }
+
+  .mini-stars {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .star-count {
+    color: white;
+    font-size: 0.9rem;
+    text-shadow: 1px 1px #000;
+  }
+
+  .mini-view-btn {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+    border: 2px solid #000;
+    border-radius: 6px;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.8rem;
+    text-decoration: none;
+    text-shadow: 1px 1px #000;
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .mini-view-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 #000;
+  }
+
+  .empty-msg {
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+    padding: 1rem;
+  }
+
+  @media (max-width: 850px) {
+    .layouts-sections {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
