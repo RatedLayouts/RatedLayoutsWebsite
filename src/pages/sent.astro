@@ -13,20 +13,55 @@ if (searchTerm) {
   apiUrl += `&${searchType}=${encodeURIComponent(searchTerm)}`;
 }
 
-const res = await fetch(apiUrl, {
-  cache: 'no-store'
-});
-const sendsData = await res.json() || { layouts: [] };
-const layouts = sendsData.layouts || [];
+interface SentLayout {
+  levelId: number;
+  levelName?: string;
+  creatorUsername?: string;
+  isPlatformer?: boolean;
+  featuredStatus?: number;
+  averageDifficulty: number;
+  suggestedFeatured: number;
+  suggestedEpic: number;
+  suggestedLegendary: number;
+  totalSuggests: number;
+}
+
+interface SendsData {
+  layouts: SentLayout[];
+  totalAmount: number;
+  amount: number;
+}
+
+let sendsData: SendsData = { layouts: [], totalAmount: 0, amount: 10 };
+
+try {
+  const res = await fetch(apiUrl, {
+    cache: 'no-store'
+  });
+
+  if (res.ok) {
+    const json = await res.json();
+    if (json && typeof json === 'object') {
+      sendsData = json;
+    }
+  } else {
+    const text = await res.text();
+    console.warn(`API returned error ${res.status}: ${text}`);
+  }
+} catch (err) {
+  console.error("Failed to fetch sends data", err);
+}
+
+const layouts: SentLayout[] = sendsData.layouts || [];
 const totalAmount = sendsData.totalAmount || 0;
 const amountPerPage = sendsData.amount || 10;
 const totalPages = Math.ceil(totalAmount / amountPerPage);
 
 // Extract all level IDs
-const ids = layouts.map(l => l.levelId).join(',');
+const ids = layouts.map((l: SentLayout) => l.levelId).join(',');
 
 // Fetch specific level metadata from boomlings
-let levelDataMap = {};
+let levelDataMap: Record<string, any> = {};
 
 if (ids.length > 0) {
   const body = new URLSearchParams({
@@ -48,9 +83,9 @@ if (ids.length > 0) {
     const gdCreatorsStr = parts.length > 1 ? parts[1] : '';
 
     // build creator map (userID -> username)
-    const creatorMap = {};
+    const creatorMap: Record<string, string> = {};
     if (gdCreatorsStr) {
-      gdCreatorsStr.split('|').forEach(creator => {
+      gdCreatorsStr.split('|').forEach((creator: string) => {
         const cParts = creator.split(':');
         if (cParts.length >= 2) {
           creatorMap[cParts[0]] = cParts[1];
@@ -60,9 +95,9 @@ if (ids.length > 0) {
 
     // build level metadata map
     if (gdLevelsStr) {
-      gdLevelsStr.split('|').forEach(lvl => {
+      gdLevelsStr.split('|').forEach((lvl: string) => {
         const elements = lvl.split(':');
-        let lvlObj = {};
+        let lvlObj: Record<string, string> = {};
         for(let i = 0; i < elements.length; i += 2) {
           if (i+1 < elements.length) {
             lvlObj[elements[i]] = elements[i+1];
@@ -86,7 +121,7 @@ if (ids.length > 0) {
 }
 
 // 3. Map retrieved data onto original layouts array
-layouts.forEach(l => {
+layouts.forEach((l: SentLayout) => {
   const meta = levelDataMap[l.levelId.toString()];
   l.levelName = meta ? meta.levelName : 'Unknown';
   l.creatorUsername = meta ? meta.creatorName : '-';
@@ -100,7 +135,7 @@ layouts.forEach(l => {
 });
 
 // Difficulty logic identical to featured.astro
-const getDifficultyPath = (diffValue, featValue) => {
+const getDifficultyPath = (diffValue: number, featValue: number) => {
   const diff = Math.round(diffValue);
   let diffName = "NA";
   let fileName = "NA";
