@@ -26,7 +26,7 @@ const level = await levelRes.json();
 const sendsRes = await fetch(
   `https://gdrate.arcticwoof.xyz/v1/getLevelSends?levelId=${levelId}`,
 );
-const sends = (await sendsRes.json()) || {};
+const sends = sendsRes.ok ? await sendsRes.json() : { sends: [] };
 
 // Fetch Votes Data
 const votesRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getVotes", {
@@ -34,7 +34,7 @@ const votesRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getVotes", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ levelId }),
 });
-const votes = (await votesRes.json()) || {};
+const votes = votesRes.ok ? await votesRes.json() : { votes: [] };
 
 const getDifficultyPath = (diffValue: number, featValue: number) => {
   let diffName = "NA";

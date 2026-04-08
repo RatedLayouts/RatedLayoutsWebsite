@@ -33,7 +33,7 @@ import Layout from "../layouts/Layout.astro";
     </a>
   </div>
   <div class="secondary-menu">
-    <a href="#" class="small-button">
+    <a href="#" class="small-button" id="credits-btn">
       <img src="/buttons/RL_credits01.png" alt="Credits" />
     </a>
     <a class="small-button" id="news-btn">
@@ -69,6 +69,13 @@ import Layout from "../layouts/Layout.astro";
         <div class="loading-spinner">LOADING...</div>
       </div>
       <button id="ok-btn" class="ok-button pusab-font">OK</button>
+    </div>
+  </div>
+  <div id="credits-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2 class="modal-title pusab-font">Rated Layouts Team/Credits</h2>
+      <div id="credits-body" class="credits-list"></div>
+      <button id="close-credits" class="ok-button pusab-font">OK</button>
     </div>
   </div>
 </Layout>
@@ -254,6 +261,109 @@ import Layout from "../layouts/Layout.astro";
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
   }
+
+  .credits-list {
+    width: 100%;
+    max-height: 55vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 12px;
+    border: 3px solid #000;
+  }
+
+  .credits-list :global(.credit-section) {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .credits-list :global(.role-title) {
+    color: #ffc800;
+    font-size: 1.4rem;
+    padding-bottom: 0.3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 2px 2px #000;
+    font-family: var(--font-heading), sans-serif !important;
+    -webkit-text-stroke: 1px black;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .credits-list :global(.role-title::after) {
+    content: "";
+    flex-grow: 1;
+    height: 3px;
+    background: rgba(255, 200, 0, 0.3);
+    border-radius: 2px;
+  }
+
+  .credits-list :global(.user-column) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+  }
+
+  .credits-list :global(.credit-user-cell) {
+    background: linear-gradient(
+      to bottom,
+      #44e0e2,
+      #186fd2
+    ); /* Leaderboard colors */
+    border: 3px solid #000;
+    border-radius: 8px;
+    padding: 0.7rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    /* 3D Inset Shadow from Leaderboard cells */
+    box-shadow:
+      inset 0 -4px 0 rgba(0, 0, 0, 0.4),
+      0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s ease;
+    text-decoration: none;
+    position: relative;
+    height: 65px;
+  }
+
+  .credits-list :global(.credit-user-cell:hover) {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+  }
+
+  .credits-list :global(.badge-container) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 50px;
+  }
+
+  .credits-list :global(.badge-container img) {
+    width: 42px;
+    height: 42px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+
+  .credits-list :global(.credit-user-name) {
+    color: white;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    text-shadow: 2px 2px #000;
+    font-family: var(--font-heading), sans-serif !important;
+    -webkit-text-stroke: 1.5px black;
+    flex-grow: 1;
+    text-align: left;
+    letter-spacing: 1px;
+  }
 </style>
 
 <script>
@@ -325,5 +435,98 @@ import Layout from "../layouts/Layout.astro";
   // Close on backdrop click
   newsModal?.addEventListener("click", (e) => {
     if (e.target === newsModal) closeModal();
+  });
+  // Credits Modal Logic
+  const creditsBtn = document.getElementById("credits-btn");
+  const creditsModal = document.getElementById("credits-modal");
+  const creditsBody = document.getElementById("credits-body");
+  const closeCredits = document.getElementById("close-credits");
+
+  const badgeMap = {
+    owner: "RL_badgeOwner.png",
+    classicAdmins: "RL_badgeAdmin01.png",
+    classicModerators: "RL_badgeMod01.png",
+    platAdmins: "RL_badgePlatAdmin01.png",
+    platModerators: "RL_badgePlatMod01.png",
+    leaderboardAdmins: "RL_badgelbAdmin01.png",
+    leaderboardModerators: "RL_badgelbMod01.png",
+    supporters: "RL_badgeSupporter.png",
+    boosters: "RL_badgeBooster.png",
+  };
+
+  const roleLabels = {
+    owner: "Rated Layouts Owner",
+    classicAdmins: "Classic Admins",
+    classicModerators: "Classic Moderators",
+    platAdmins: "Platformer Admins",
+    platModerators: "Platformer Moderators",
+    leaderboardAdmins: "Leaderboard Admins",
+    leaderboardModerators: "Leaderboard Moderators",
+    supporters: "Layout Supporters",
+    boosters: "LayoutBoosters",
+  };
+
+  const openCredits = async () => {
+    creditsModal?.classList.remove("hidden");
+    creditsBody!.innerHTML = '<div class="loading-spinner">LOADING...</div>';
+
+    try {
+      const res = await fetch("/api/getCredits");
+      const data = await res.json();
+
+      if (data && data.success) {
+        let html = "";
+        const roles = [
+          "owner",
+          "classicAdmins",
+          "classicModerators",
+          "platAdmins",
+          "platModerators",
+          "leaderboardAdmins",
+          "leaderboardModerators",
+          "supporters",
+          "boosters",
+        ];
+
+        roles.forEach((role) => {
+          const users = data[role];
+          if (users && users.length > 0) {
+            html += `
+              <div class="credit-section">
+                <div class="role-title">${roleLabels[role]}</div>
+                <div class="user-column">
+                  ${users
+                    .map(
+                      (u) => `
+                    <a href="/profile/${u.accountId}" class="credit-user-cell">
+                      <div class="badge-container">
+                        <img src="/badge/${badgeMap[role]}" alt="${role}" />
+                      </div>
+                      <span class="credit-user-name">${u.username}</span>
+                    </a>
+                  `,
+                    )
+                    .join("")}
+                </div>
+              </div>
+            `;
+          }
+        });
+        creditsBody!.innerHTML = html;
+      }
+    } catch (err) {
+      creditsBody!.innerHTML = "Failed to load credits.";
+    }
+  };
+
+  creditsBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openCredits();
+  });
+  closeCredits?.addEventListener("click", () =>
+    creditsModal?.classList.add("hidden"),
+  );
+  creditsModal?.addEventListener("click", (e) => {
+    if (e.target === creditsModal) creditsModal.classList.add("hidden");
   });
 </script>
