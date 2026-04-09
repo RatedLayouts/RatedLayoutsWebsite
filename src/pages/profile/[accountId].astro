@@ -227,7 +227,16 @@ const nameplateStyle = profile.nameplate
           />
         </div>
         <div class="stat-info">
-          <span class="stat-value pusab-font">{profile.sparks}</span>
+          <div class="stat-value-row">
+            <span class="stat-value pusab-font">{profile.sparks}</span>
+            {
+              profile.leaderboard?.sparks && (
+                <span class="stat-rank pusab-font">
+                  #{profile.leaderboard.sparks}
+                </span>
+              )
+            }
+          </div>
           <span class="stat-label pusab-font">Sparks</span>
         </div>
       </div>
@@ -240,7 +249,16 @@ const nameplateStyle = profile.nameplate
           />
         </div>
         <div class="stat-info">
-          <span class="stat-value pusab-font">{profile.planets}</span>
+          <div class="stat-value-row">
+            <span class="stat-value pusab-font">{profile.planets}</span>
+            {
+              profile.leaderboard?.planets && (
+                <span class="stat-rank pusab-font">
+                  #{profile.leaderboard.planets}
+                </span>
+              )
+            }
+          </div>
           <span class="stat-label pusab-font">Planets</span>
         </div>
       </div>
@@ -253,7 +271,16 @@ const nameplateStyle = profile.nameplate
           />
         </div>
         <div class="stat-info">
-          <span class="stat-value pusab-font">{profile.blueCoins}</span>
+          <div class="stat-value-row">
+            <span class="stat-value pusab-font">{profile.blueCoins}</span>
+            {
+              profile.leaderboard?.blueCoins && (
+                <span class="stat-rank pusab-font">
+                  #{profile.leaderboard.blueCoins}
+                </span>
+              )
+            }
+          </div>
           <span class="stat-label pusab-font">Blue Coins</span>
         </div>
       </div>
@@ -262,7 +289,16 @@ const nameplateStyle = profile.nameplate
           <img src="/stats/RL_commVote.png" alt="Votes" class="stat-icon-big" />
         </div>
         <div class="stat-info">
-          <span class="stat-value pusab-font">{profile.votes}</span>
+          <div class="stat-value-row">
+            <span class="stat-value pusab-font">{profile.votes}</span>
+            {
+              profile.leaderboard?.votes && (
+                <span class="stat-rank pusab-font">
+                  #{profile.leaderboard.votes}
+                </span>
+              )
+            }
+          </div>
           <span class="stat-label pusab-font">Votes</span>
         </div>
       </div>
@@ -275,7 +311,16 @@ const nameplateStyle = profile.nameplate
           />
         </div>
         <div class="stat-info">
-          <span class="stat-value pusab-font">{profile.creatorPoints}</span>
+          <div class="stat-value-row">
+            <span class="stat-value pusab-font">{profile.creatorPoints}</span>
+            {
+              profile.leaderboard?.creatorPoints && (
+                <span class="stat-rank pusab-font">
+                  #{profile.leaderboard.creatorPoints}
+                </span>
+              )
+            }
+          </div>
           <span class="stat-label pusab-font">Blueprints</span>
         </div>
       </div>
@@ -564,6 +609,18 @@ const nameplateStyle = profile.nameplate
     text-transform: uppercase;
     font-weight: bold;
     text-shadow: 2.5px 2.5px #00000050;
+  }
+
+  .stat-value-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .stat-rank {
+    color: #ffd966;
+    font-size: 1rem;
+    text-shadow: 1.5px 1.5px #00000050;
   }
 
   /* Sections */
