@@ -156,8 +156,54 @@ import Layout from "../layouts/Layout.astro";
 
   :global(.nameplate-card:hover) {
     transform: scale(1.05);
-    filter: brightness(1.1);
+    filter: brightness(1.2);
     z-index: 10;
+  }
+
+  /* Hover Overlay Styles */
+  :global(.card-hover-overlay) {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    backdrop-filter: blur(2px);
+  }
+
+  :global(.nameplate-card:hover .card-hover-overlay) {
+    opacity: 1;
+  }
+
+  :global(.card-price) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-size: 1.3rem;
+    text-shadow: 2px 2px #000;
+    font-family: var(--font-heading) !important;
+  }
+
+  :global(.card-price span) {
+    font-family: var(--font-heading) !important;
+  }
+
+  :global(.ruby-mini) {
+    height: 24px;
+    width: auto;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  }
+
+  :global(.card-creator) {
+    color: #ffc800; /* Gold */
+    font-size: 1rem;
+    text-shadow: 1.5px 1.5px #000;
+    margin-top: 0.3rem;
+    font-family: var(--font-heading) !important;
   }
 
   .pagination-controls {
@@ -200,12 +246,13 @@ import Layout from "../layouts/Layout.astro";
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.75);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(3px);
+    opacity: 1;
     transition: opacity 0.3s ease;
   }
 
@@ -215,16 +262,20 @@ import Layout from "../layouts/Layout.astro";
   }
 
   .modal-content {
-    background: linear-gradient(to bottom, #1a1a1a, #0d0d0d);
-    border: 4px solid #ffd966;
+    background: linear-gradient(to bottom, #103b70, #081d38);
+    border: 4px solid #4cbdff;
     border-radius: 16px;
-    padding: 2.5rem;
-    max-width: 600px;
+    padding: 2.5rem 2rem;
+    max-width: 650px;
     width: 90%;
+    color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+    box-shadow:
+      0 0 30px rgba(0, 0, 0, 0.8),
+      inset 0 0 20px rgba(76, 189, 255, 0.2);
+    text-align: center;
     transform: scale(1);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
@@ -235,7 +286,7 @@ import Layout from "../layouts/Layout.astro";
 
   .preview-banner-box {
     width: 100%;
-    height: 60px;
+    height: 65px;
     border: 4px solid #000;
     border-radius: 12px;
     margin-bottom: 2rem;
@@ -290,32 +341,33 @@ import Layout from "../layouts/Layout.astro";
   }
 
   .preview-creator-name {
-    color: #4cbdff;
-    font-size: 1.6rem;
-    text-decoration: none;
-    text-shadow: 2px 2px #000;
+    color: #ffc800; /* Gold */
+    font-size: 1.5rem;
+    text-shadow: 2.5px 2.5px #00000050;
+    transition: transform 0.1s;
   }
 
   .preview-creator-name:hover {
-    text-decoration: underline;
-    color: #00d2ff;
+    transform: scale(1.05);
   }
 
   .ok-button {
     background: linear-gradient(to bottom, #00d2ff, #0072ff);
     border: 3px solid #000;
-    border-radius: 8px;
+    border-radius: 6px;
     color: white;
-    padding: 0.6rem 2rem;
+    padding: 0.5rem 1.2rem;
     font-size: 1.5rem;
     cursor: pointer;
-    text-shadow: 2px 2px #000;
+    text-shadow: 2.5px 2.5px #00000050;
     box-shadow: 0 4px 0 #000;
+    transition: all 0.1s;
+    letter-spacing: 1px;
   }
 
   .ok-button:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 #000;
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #000;
   }
 
   .loading-spinner {
@@ -388,10 +440,20 @@ import Layout from "../layouts/Layout.astro";
         let html = "";
         data.nameplates.forEach((np) => {
           const npData = JSON.stringify(np).replace(/"/g, "&quot;");
+          const creator = (np.author && np.author.username) || "Unknown";
+          const price = np.price || 0;
+
           html += `
             <div class="nameplate-card" 
                  style="background: url('/api/nameplates/banner/nameplate_${np.index}.png') center/cover no-repeat"
                  onclick="window.showNameplatePreview(${npData})">
+                 <div class="card-hover-overlay">
+                    <div class="card-price pusab-font">
+                        <img src="/stats/RL_rubiesIcon.png" alt="Rubies" class="ruby-mini" />
+                        <span>${price}</span>
+                    </div>
+                    <div class="card-creator pusab-font">By ${creator}</div>
+                 </div>
             </div>
           `;
         });
