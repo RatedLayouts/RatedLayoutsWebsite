@@ -37,7 +37,9 @@ import Layout from "../layouts/Layout.astro";
   <!-- Preview Modal (Keep as modal for better focus) -->
   <div id="preview-modal" class="modal-overlay hidden" style="z-index: 10000;">
     <div class="modal-content preview-content">
-      <div id="preview-banner" class="preview-banner-box"></div>
+      <a id="preview-banner-link" href="#" target="_blank" style="width: 100%;">
+        <div id="preview-banner" class="preview-banner-box"></div>
+      </a>
       <div class="preview-details">
         <div class="preview-price-row">
           <img
@@ -233,7 +235,7 @@ import Layout from "../layouts/Layout.astro";
 
   .preview-banner-box {
     width: 100%;
-    height: 120px;
+    height: 60px;
     border: 4px solid #000;
     border-radius: 12px;
     margin-bottom: 2rem;
@@ -242,6 +244,13 @@ import Layout from "../layouts/Layout.astro";
     background-repeat: no-repeat;
     background-color: rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  .preview-banner-box:hover {
+    transform: scale(1.02);
+    border-color: #00d2ff;
   }
 
   .preview-details {
@@ -311,10 +320,14 @@ import Layout from "../layouts/Layout.astro";
 
   .loading-spinner {
     grid-column: 1 / -1;
-    text-align: center;
-    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 350px;
+    font-size: 2.5rem;
     color: white;
-    padding: 3rem;
+    text-shadow: 2px 2px #000;
+    font-family: var(--font-heading), sans-serif;
   }
 
   @media (max-width: 600px) {
@@ -340,6 +353,9 @@ import Layout from "../layouts/Layout.astro";
 
   const previewModal = document.getElementById("preview-modal");
   const previewBanner = document.getElementById("preview-banner");
+  const previewBannerLink = document.getElementById(
+    "preview-banner-link",
+  ) as HTMLAnchorElement;
   const previewPrice = document.getElementById("preview-price");
   const previewCreatorLink = document.getElementById("preview-creator-link");
   const closePreview = document.getElementById("close-preview");
@@ -350,6 +366,8 @@ import Layout from "../layouts/Layout.astro";
 
   const fetchNameplates = async (page = 1) => {
     if (isFetchingShop) return;
+    if (!shopBody || !shopPageDisplay || !shopTotalDisplay) return;
+
     isFetchingShop = true;
     shopBody.innerHTML = '<div class="loading-spinner">LOADING...</div>';
 
@@ -381,7 +399,7 @@ import Layout from "../layouts/Layout.astro";
         shopBody.innerHTML =
           html || '<div class="loading-spinner">NO NAMEPLATES FOUND</div>';
         shopPageDisplay.innerText = `Page ${currentShopPage} / ${totalShopPages}`;
-        shopTotalDisplay.innerText = `Total items: ${totalAmount}`;
+        shopTotalDisplay.innerText = `Total: ${totalAmount}`;
 
         shopPrev.classList.toggle("disabled", currentShopPage <= 1);
         shopNext.classList.toggle(
@@ -404,8 +422,11 @@ import Layout from "../layouts/Layout.astro";
   };
 
   window.showNameplatePreview = (data) => {
-    previewBanner.style.backgroundImage = `url('/api/nameplates/banner/nameplate_${data.index}.png')`;
-    previewPrice.innerText = data.price || 0;
+    const bannerUrl = `/api/nameplates/banner/nameplate_${data.index}.png`;
+    if (previewBanner)
+      previewBanner.style.backgroundImage = `url('${bannerUrl}')`;
+    if (previewBannerLink) previewBannerLink.href = bannerUrl;
+    if (previewPrice) previewPrice.innerText = data.price || 0;
     previewCreatorLink.innerText =
       (data.author && data.author.username) || "Unknown";
     previewCreatorLink.href = `/profile/${(data.author && data.author.accountId) || ""}`;
