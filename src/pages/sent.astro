@@ -24,6 +24,7 @@ interface SentLayout {
   suggestedEpic: number;
   suggestedLegendary: number;
   totalSuggests: number;
+  totalRejection: number;
 }
 
 interface SendsData {
@@ -203,12 +204,24 @@ const getDifficultyPath = (diffValue: number, featValue: number) => {
                 <span class="creator-name pusab-font">{level.creatorUsername}</span>
             </div>
             <div class="suggests-row">
-               <span class="suggest-value pusab-font">{level.suggestedFeatured}</span>
-               <img src="/difficulty/NA/NA_featured.png" alt="Suggested Featured" class="suggest-icon" />
-               <span class="suggest-value pusab-font">{level.suggestedEpic}</span>
-               <img src="/difficulty/NA/NA_epic.png" alt="Suggested Epic" class="suggest-icon" />
-               <span class="suggest-value pusab-font">{level.suggestedLegendary}</span>
-               <img src="/difficulty/NA/NA_legendary.png" alt="Suggested Legendary" class="suggest-icon" />
+              {level.suggestedFeatured > 0 && (
+                <>
+                  <span class="suggest-value pusab-font">{level.suggestedFeatured}</span>
+                  <img src="/difficulty/NA/NA_featured.png" alt="Suggested Featured" class="suggest-icon" />
+                </>
+              )}
+              {level.suggestedEpic > 0 && (
+                <>
+                  <span class="suggest-value pusab-font">{level.suggestedEpic}</span>
+                  <img src="/difficulty/NA/NA_epic.png" alt="Suggested Epic" class="suggest-icon" />
+                </>
+              )}
+              {level.suggestedLegendary > 0 && (
+                <>
+                  <span class="suggest-value pusab-font">{level.suggestedLegendary}</span>
+                  <img src="/difficulty/NA/NA_legendary.png" alt="Suggested Legendary" class="suggest-icon" />
+                </>
+              )}
             </div>
           </div>
 
@@ -218,6 +231,14 @@ const getDifficultyPath = (diffValue: number, featValue: number) => {
               <span class="score-label">Total Suggestions:</span>
               <span class="score-value">{level.totalSuggests}</span>
             </div>
+            {
+              level.totalRejection > 0 && (
+                <div class="featured-score rejection">
+                  <span class="score-label">Total Rejections:</span>
+                  <span class="score-value">{level.totalRejection}</span>
+                </div>
+              )
+            }
           </div>
         </div>
       ))}
@@ -524,6 +545,10 @@ const getDifficultyPath = (diffValue: number, featValue: number) => {
   .featured-score {
     font-family: inherit;
     font-size: 1rem;
+  }
+
+  .featured-score.rejection {
+    color: #ff5050;
   }
 
   .score-value {
