@@ -230,7 +230,7 @@ const nameplateStyle = profile.nameplate
           <div class="stat-value-row">
             <span class="stat-value pusab-font">{profile.sparks}</span>
             {
-              profile.leaderboard?.sparks && (
+              profile.leaderboard?.sparks > 0 && (
                 <span class="stat-rank pusab-font">
                   #{profile.leaderboard.sparks}
                 </span>
@@ -252,7 +252,7 @@ const nameplateStyle = profile.nameplate
           <div class="stat-value-row">
             <span class="stat-value pusab-font">{profile.planets}</span>
             {
-              profile.leaderboard?.planets && (
+              profile.leaderboard?.planets > 0 && (
                 <span class="stat-rank pusab-font">
                   #{profile.leaderboard.planets}
                 </span>
@@ -274,7 +274,7 @@ const nameplateStyle = profile.nameplate
           <div class="stat-value-row">
             <span class="stat-value pusab-font">{profile.blueCoins}</span>
             {
-              profile.leaderboard?.blueCoins && (
+              profile.leaderboard?.blueCoins > 0 && (
                 <span class="stat-rank pusab-font">
                   #{profile.leaderboard.blueCoins}
                 </span>
@@ -292,7 +292,7 @@ const nameplateStyle = profile.nameplate
           <div class="stat-value-row">
             <span class="stat-value pusab-font">{profile.votes}</span>
             {
-              profile.leaderboard?.votes && (
+              profile.leaderboard?.votes > 0 && (
                 <span class="stat-rank pusab-font">
                   #{profile.leaderboard.votes}
                 </span>
@@ -314,7 +314,7 @@ const nameplateStyle = profile.nameplate
           <div class="stat-value-row">
             <span class="stat-value pusab-font">{profile.creatorPoints}</span>
             {
-              profile.leaderboard?.creatorPoints && (
+              profile.leaderboard?.creatorPoints > 0 && (
                 <span class="stat-rank pusab-font">
                   #{profile.leaderboard.creatorPoints}
                 </span>
@@ -607,7 +607,6 @@ const nameplateStyle = profile.nameplate
   .stat-label {
     font-size: 1rem;
     text-transform: uppercase;
-    font-weight: bold;
     text-shadow: 2.5px 2.5px #00000050;
   }
 

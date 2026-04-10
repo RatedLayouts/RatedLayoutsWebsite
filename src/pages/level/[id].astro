@@ -27,7 +27,14 @@ try {
   return Astro.redirect("/404");
 }
 
-let sends: any = { sends: [], suggestedTotal: 0, suggestedFeatured: 0, suggestedEpic: 0, suggestedLegendary: 0, rejectedTotal: 0 };
+let sends: any = {
+  sends: [],
+  suggestedTotal: 0,
+  suggestedFeatured: 0,
+  suggestedEpic: 0,
+  suggestedLegendary: 0,
+  rejectedTotal: 0,
+};
 try {
   const sendsRes = await fetch(
     `https://gdrate.arcticwoof.xyz/v1/getLevelSends?levelId=${levelId}`,
@@ -39,7 +46,13 @@ try {
   console.error("Failed to fetch sends:", e);
 }
 
-let votes: any = { votes: [], totalVotes: 0, gameplayScore: 0, originalityScore: 0, difficultyScore: 0 };
+let votes: any = {
+  votes: [],
+  totalVotes: 0,
+  gameplayScore: 0,
+  originalityScore: 0,
+  difficultyScore: 0,
+};
 try {
   const votesRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getVotes", {
     method: "POST",
@@ -379,6 +392,7 @@ const formatScore = (score: any) => {
     letter-spacing: 1px;
     border-bottom: 2px solid rgba(0, 0, 0, 0.3);
     padding-bottom: 0.8rem;
+    text-shadow: 1.5px 1.5px #00000050;
   }
 
   /* Stats Grid */
@@ -402,7 +416,7 @@ const formatScore = (score: any) => {
   .stat-label {
     font-size: 1rem;
     text-transform: uppercase;
-    font-weight: bold;
+    text-shadow: 1.5px 1.5px #00000050;
   }
 
   .stat-value {
