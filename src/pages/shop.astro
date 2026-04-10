@@ -1,0 +1,434 @@
+---
+export const prerender = false;
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Rated Layouts Shop">
+  <div class="list-container">
+    <div class="header-row">
+      <h1 class="page-title pusab-font">Rated Layouts Ruby Shop</h1>
+      <div class="stats-counter pusab-font">
+        <div class="current-page" id="shop-page-display">Page 1</div>
+        <div class="total-levels" id="shop-total-display">Total: 0</div>
+      </div>
+    </div>
+
+    <div class="shop-list-wrapper">
+      <div id="shop-body" class="shop-grid">
+        <div class="loading-spinner">LOADING...</div>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls">
+      <button id="shop-prev" class="nav-button prev-button disabled">
+        <img
+          src="/buttons/RL_prev01.png"
+          alt="Previous"
+          class="nav-button-bg"
+        />
+      </button>
+      <button id="shop-next" class="nav-button next-button disabled">
+        <img src="/buttons/RL_next01.png" alt="Next" class="nav-button-bg" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Preview Modal (Keep as modal for better focus) -->
+  <div id="preview-modal" class="modal-overlay hidden" style="z-index: 10000;">
+    <div class="modal-content preview-content">
+      <div id="preview-banner" class="preview-banner-box"></div>
+      <div class="preview-details">
+        <div class="preview-price-row">
+          <img
+            src="/stats/RL_rubiesIcon.png"
+            alt="Rubies"
+            class="ruby-icon-small"
+          />
+          <span id="preview-price" class="pusab-font">0</span>
+        </div>
+        <div class="preview-creator-row">
+          <span class="pusab-font preview-creator-name">
+            By
+            <a
+              id="preview-creator-link"
+              href="#"
+              class="preview-creator-name pusab-font">NAME</a
+            >
+          </span>
+        </div>
+      </div>
+      <button id="close-preview" class="ok-button pusab-font">OK</button>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .list-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+    gap: 1rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    text-shadow: 2.5px 2.5px #00000050;
+    margin: 0;
+  }
+
+  .stats-counter {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: #ffd966;
+    text-align: right;
+    text-shadow: 2.5px 2.5px #00000050;
+  }
+
+  .current-page {
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  .total-levels {
+    font-size: 1rem;
+    color: white;
+  }
+
+  .tabs-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(to bottom, #4a4a4a, #2a2a2a);
+    border: 3px solid #000;
+    border-radius: 6px;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    font-size: 1.2rem;
+    cursor: default;
+    text-shadow: 2.5px 2.5px #00000050;
+    box-shadow: 0 4px 0 #000;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+  }
+
+  .shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+    min-height: 400px;
+  }
+
+  :global(.nameplate-card) {
+    border: 4px solid #000;
+    border-radius: 12px;
+    height: 100px;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  :global(.nameplate-card:hover) {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+    z-index: 10;
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .nav-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
+    position: relative;
+    transition: transform 0.2s;
+  }
+
+  .nav-button-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .nav-button:hover:not(.disabled) {
+    transform: scale(1.1);
+  }
+
+  .nav-button.disabled {
+    opacity: 0.3;
+    filter: grayscale(1);
+    cursor: not-allowed;
+  }
+
+  /* Preview Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .modal-content {
+    background: linear-gradient(to bottom, #1a1a1a, #0d0d0d);
+    border: 4px solid #ffd966;
+    border-radius: 16px;
+    padding: 2.5rem;
+    max-width: 600px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .modal-overlay.hidden .modal-content {
+    transform: scale(0.9);
+  }
+
+  .preview-banner-box {
+    width: 100%;
+    height: 120px;
+    border: 4px solid #000;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .preview-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+    width: 100%;
+  }
+
+  .preview-price-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.6rem 1.8rem;
+    border-radius: 25px;
+    border: 2px solid #ffd966;
+  }
+
+  .ruby-icon-small {
+    height: 35px;
+    width: auto;
+  }
+
+  #preview-price {
+    font-size: 2rem;
+    color: white;
+    text-shadow: 2px 2px #000;
+  }
+
+  .preview-creator-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .preview-creator-name {
+    color: #4cbdff;
+    font-size: 1.6rem;
+    text-decoration: none;
+    text-shadow: 2px 2px #000;
+  }
+
+  .preview-creator-name:hover {
+    text-decoration: underline;
+    color: #00d2ff;
+  }
+
+  .ok-button {
+    background: linear-gradient(to bottom, #00d2ff, #0072ff);
+    border: 3px solid #000;
+    border-radius: 8px;
+    color: white;
+    padding: 0.6rem 2rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    text-shadow: 2px 2px #000;
+    box-shadow: 0 4px 0 #000;
+  }
+
+  .ok-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000;
+  }
+
+  .loading-spinner {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 2rem;
+    color: white;
+    padding: 3rem;
+  }
+
+  @media (max-width: 600px) {
+    .page-title {
+      font-size: 2rem;
+    }
+    .header-row {
+      flex-direction: column;
+      text-align: center;
+    }
+    .shop-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const shopBody = document.getElementById("shop-body");
+  const shopPrev = document.getElementById("shop-prev");
+  const shopNext = document.getElementById("shop-next");
+  const shopPageDisplay = document.getElementById("shop-page-display");
+  const shopTotalDisplay = document.getElementById("shop-total-display");
+
+  const previewModal = document.getElementById("preview-modal");
+  const previewBanner = document.getElementById("preview-banner");
+  const previewPrice = document.getElementById("preview-price");
+  const previewCreatorLink = document.getElementById("preview-creator-link");
+  const closePreview = document.getElementById("close-preview");
+
+  let currentShopPage = 1;
+  let totalShopPages = 1;
+  let isFetchingShop = false;
+
+  const fetchNameplates = async (page = 1) => {
+    if (isFetchingShop) return;
+    isFetchingShop = true;
+    shopBody.innerHTML = '<div class="loading-spinner">LOADING...</div>';
+
+    try {
+      const res = await fetch("/api/getNameplates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: 20, page: page }),
+      });
+      const data = await res.json();
+
+      if (data && data.nameplates) {
+        currentShopPage = page;
+        const totalAmount = data.totalAmount || data.totalCount || 0;
+        const amountPerPage = data.amount || 20;
+        totalShopPages = Math.ceil(totalAmount / amountPerPage) || 1;
+
+        let html = "";
+        data.nameplates.forEach((np) => {
+          const npData = JSON.stringify(np).replace(/"/g, "&quot;");
+          html += `
+            <div class="nameplate-card" 
+                 style="background: url('/api/nameplates/banner/nameplate_${np.index}.png') center/cover no-repeat"
+                 onclick="window.showNameplatePreview(${npData})">
+            </div>
+          `;
+        });
+
+        shopBody.innerHTML =
+          html || '<div class="loading-spinner">NO NAMEPLATES FOUND</div>';
+        shopPageDisplay.innerText = `Page ${currentShopPage} / ${totalShopPages}`;
+        shopTotalDisplay.innerText = `Total items: ${totalAmount}`;
+
+        shopPrev.classList.toggle("disabled", currentShopPage <= 1);
+        shopNext.classList.toggle(
+          "disabled",
+          currentShopPage >= totalShopPages,
+        );
+
+        // Update URL without reload
+        const url = new URL(window.location);
+        url.searchParams.set("page", page);
+        window.history.pushState({}, "", url);
+      }
+    } catch (err) {
+      console.error(err);
+      shopBody.innerHTML =
+        '<div style="color: #ff4040; text-align: center; grid-column: 1/-1;">Failed to load shop.</div>';
+    } finally {
+      isFetchingShop = false;
+    }
+  };
+
+  window.showNameplatePreview = (data) => {
+    previewBanner.style.backgroundImage = `url('/api/nameplates/banner/nameplate_${data.index}.png')`;
+    previewPrice.innerText = data.price || 0;
+    previewCreatorLink.innerText =
+      (data.author && data.author.username) || "Unknown";
+    previewCreatorLink.href = `/profile/${(data.author && data.author.accountId) || ""}`;
+    previewModal.classList.remove("hidden");
+  };
+
+  shopPrev?.addEventListener("click", () => {
+    if (currentShopPage > 1) fetchNameplates(currentShopPage - 1);
+  });
+
+  shopNext?.addEventListener("click", () => {
+    if (currentShopPage < totalShopPages) fetchNameplates(currentShopPage + 1);
+  });
+
+  closePreview?.addEventListener("click", () =>
+    previewModal.classList.add("hidden"),
+  );
+  previewModal?.addEventListener("click", (e) => {
+    if (e.target === previewModal) previewModal.classList.add("hidden");
+  });
+
+  // Initial load
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialPage = parseInt(urlParams.get("page")) || 1;
+  fetchNameplates(initialPage);
+</script>
