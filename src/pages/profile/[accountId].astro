@@ -15,12 +15,12 @@ const sentPage = parseInt(searchParams.get("sentPage") || "1");
 
 let profile: any = null;
 try {
-  const profileRes = await fetch(
-    `https://gdrate.arcticwoof.xyz/v1/getProfile?accountId=${id}`,
-    {
-      cache: "no-store",
-    },
-  );
+  const profileRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getProfile", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ accountId: id }),
+    cache: "no-store",
+  });
   if (!profileRes.ok) {
     return Astro.redirect("/");
   }
