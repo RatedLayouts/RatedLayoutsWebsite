@@ -67,14 +67,23 @@ import Layout from "../layouts/Layout.astro";
 
   <!-- News Modal -->
   <div id="news-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <h2 id="news-title" class="modal-title pusab-font">
-        Rated Layouts Annoucement
+    <div class="modal-content news-modal-content">
+      <h2 class="modal-title news-main-title pusab-font">
+        Rated Layouts Announcements
       </h2>
-      <div id="news-body" class="modal-body">
-        <div class="loading-spinner">LOADING...</div>
+      <div class="news-container">
+        <aside id="news-sidebar" class="news-sidebar">
+          <!-- Announcements list will be rendered here -->
+          <div class="loading-spinner">LOADING...</div>
+        </aside>
+        <main class="news-main">
+          <div id="news-body" class="modal-body news-selected-body">
+            <!-- Selected announcement body will be rendered here -->
+            <div class="loading-spinner">SELECT AN ARTICLE</div>
+          </div>
+        </main>
       </div>
-      <button id="ok-btn" class="ok-button pusab-font">OK</button>
+      <button id="ok-btn" class="ok-button pusab-font">CLOSE</button>
     </div>
   </div>
   <div id="credits-modal" class="modal-overlay hidden">
@@ -379,6 +388,121 @@ import Layout from "../layouts/Layout.astro";
     text-align: left;
     letter-spacing: 1px;
   }
+  .news-modal-content {
+    max-width: 900px !important;
+    width: 95% !important;
+    padding: 2rem !important;
+  }
+
+  .news-main-title {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .news-container {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    height: 60vh;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .news-sidebar {
+    width: 250px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    text-align: left !important;
+  }
+
+  .news-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .news-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  .news-sidebar :global(.news-sidebar-item) {
+    background: linear-gradient(to bottom, #44e0e2, #186fd2);
+    border: 3px solid #000;
+    border-radius: 8px;
+    padding: 0.8rem;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow:
+      inset 0 -4px 0 rgba(0, 0, 0, 0.4),
+      0 4px 10px rgba(0, 0, 0, 0.3);
+    transition:
+      transform 0.1s ease,
+      filter 0.1s ease;
+    text-align: center;
+    min-height: 70px;
+    flex-shrink: 0;
+  }
+
+  .news-sidebar :global(.news-sidebar-item:hover) {
+    transform: scale(1.03);
+    filter: brightness(1.1);
+  }
+
+  .news-sidebar :global(.news-sidebar-item.active) {
+    filter: brightness(1.2);
+    border-color: #ffd966;
+    box-shadow:
+      inset 0 -4px 0 rgba(0, 0, 0, 0.4),
+      0 0 15px rgba(255, 217, 102, 0.5);
+  }
+
+  .news-sidebar :global(.news-item-date) {
+    font-size: 1.1rem;
+    color: white;
+    font-weight: bold;
+    text-shadow: 2.5px 2.5px #00000050;
+    font-family: var(--font-heading), sans-serif !important;
+    -webkit-text-stroke: 0.5px black;
+  }
+
+  .news-sidebar :global(.news-item-time) {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 0.2rem;
+    font-family: var(--font-main) !important;
+  }
+
+  .news-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .news-selected-body {
+    margin-bottom: 0 !important;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.25) !important;
+  }
+
+  @media (max-width: 768px) {
+    .news-container {
+      flex-direction: column;
+      height: 70vh;
+    }
+
+    .news-sidebar {
+      width: 100%;
+      height: 200px;
+    }
+  }
 </style>
 
 <script>
@@ -409,30 +533,91 @@ import Layout from "../layouts/Layout.astro";
   const newsBtn = document.getElementById("news-btn");
   const newsModal = document.getElementById("news-modal");
   const newsBody = document.getElementById("news-body");
+  const newsSidebar = document.getElementById("news-sidebar");
   const okBtn = document.getElementById("ok-btn");
+
+  let announcements = [];
+
+  const cleanBody = (body: string) => {
+    return body
+      .replace(/<cb>/g, '<span style="color: #4c5cf5">')
+      .replace(/<cg>/g, '<span style="color: #40ff40">')
+      .replace(/<cl>/g, '<span style="color: #4cbdff">')
+      .replace(/<cj>/g, '<span style="color: #32ffff">')
+      .replace(/<cy>/g, '<span style="color: #ffff00">')
+      .replace(/<co>/g, '<span style="color: #ffa500">')
+      .replace(/<cr>/g, '<span style="color: #ff4040">')
+      .replace(/<cp>/g, '<span style="color: #ff00ff">')
+      .replace(/<ca>/g, '<span style="color: #9c4cff">')
+      .replace(/<cd>/g, '<span style="color: #ff9cfc">')
+      .replace(/<cc>/g, '<span style="color: #ffff9c">')
+      .replace(/<cf>/g, '<span style="color: #9cffff">')
+      .replace(/<cs>/g, '<span style="color: #ffcf00">')
+      .replace(/<\/c>/g, "</span>");
+  };
+
+  const displayAnnouncement = async (index: number) => {
+    const announcement = announcements[index];
+    if (!announcement) return;
+
+    // Update active state in sidebar
+    document.querySelectorAll(".news-sidebar-item").forEach((item, i) => {
+      if (i === index) item.classList.add("active");
+      else item.classList.remove("active");
+    });
+
+    newsBody!.innerHTML = '<div class="loading-spinner">LOADING...</div>';
+    const cleanedBody = cleanBody(announcement.body);
+    newsBody!.innerHTML = await marked.parse(cleanedBody);
+  };
 
   const openModal = async () => {
     newsModal?.classList.remove("hidden");
-    newsBody!.innerHTML = '<div class="loading-spinner">LOADING...</div>';
+    newsSidebar!.innerHTML = '<div class="loading-spinner">LOADING...</div>';
+    newsBody!.innerHTML =
+      '<div class="loading-spinner">SELECT AN ARTICLE</div>';
 
     try {
-      const res = await fetch("/api/getAnnoucement");
-      const data = await res.json();
-      if (data && data.body) {
-        // Simple regex to fix common GD tags like <cl>, <cg>, etc.
-        let cleanedBody = data.body
-          .replace(/<cf>/g, '<span style="color: #ffc800">')
-          .replace(/<cl>/g, '<span style="color: #4cbdff">')
-          .replace(/<cg>/g, '<span style="color: #40ff40">')
-          .replace(/<cr>/g, '<span style="color: #ff4040">')
-          .replace(/<cp>/g, '<span style="color: #ff40ff>')
-          .replace(/<\/c>/g, "</span>");
+      const res = await fetch("/api/getAllAnnouncement");
+      announcements = await res.json();
 
-        newsBody!.innerHTML = await marked.parse(cleanedBody);
+      if (announcements && announcements.length > 0) {
+        newsSidebar!.innerHTML = announcements
+          .map((ann: any, i: number) => {
+            const dateObj = new Date(ann.timestamp);
+            const date = dateObj.toLocaleDateString();
+            const time = dateObj.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
+            return `
+            <div class="news-sidebar-item" data-index="${i}">
+              <div class="news-item-date">${date}</div>
+              <div class="news-item-time">${time}</div>
+            </div>
+          `;
+          })
+          .join("");
+
+        // Add event listeners
+        document.querySelectorAll(".news-sidebar-item").forEach((item) => {
+          item.addEventListener("click", () => {
+            const index = parseInt(item.getAttribute("data-index") || "0");
+            displayAnnouncement(index);
+          });
+        });
+
+        // Display latest by default
+        displayAnnouncement(0);
+      } else {
+        newsSidebar!.innerHTML =
+          '<div style="padding: 1rem">No announcements found.</div>';
+        newsBody!.innerHTML = "";
       }
     } catch (err) {
+      newsSidebar!.innerHTML = "";
       newsBody!.innerHTML =
-        '<div style="color: #ff4040">Failed to load news. Please try again later.</div>';
+        '<div style="color: #ff4040; padding: 1rem">Failed to load news. Please try again later.</div>';
     }
   };
 
