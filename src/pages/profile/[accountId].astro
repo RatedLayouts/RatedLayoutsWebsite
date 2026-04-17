@@ -15,12 +15,15 @@ const sentPage = parseInt(searchParams.get("sentPage") || "1");
 
 let profile: any = null;
 try {
-  const profileRes = await fetch("https://gdrate.arcticwoof.xyz/v1/getProfile", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ accountId: id }),
-    cache: "no-store",
-  });
+  const profileRes = await fetch(
+    "https://gdrate.arcticwoof.xyz/v1/getProfile",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accountId: id }),
+      cache: "no-store",
+    },
+  );
   if (!profileRes.ok) {
     return Astro.redirect("/");
   }
@@ -136,7 +139,8 @@ if (rawSentLayouts.length > 0) {
 }
 
 const badges: string[] = [];
-if (id === 7689052) badges.push("/badge/RL_badgeOwner.png");
+if (profile.isOwner) badges.push("/badge/RL_badgeOwner.png");
+if (profile.isDeveloper) badges.push("/badge/RL_badgeDeveloper.png");
 if (profile.isBooster) badges.push("/badge/RL_badgeBooster.png");
 if (profile.isSupporter) badges.push("/badge/RL_badgeSupporter.png");
 if (profile.isClassicMod) badges.push("/badge/RL_badgeMod01.png");
