@@ -513,8 +513,6 @@ import Layout from "../layouts/Layout.astro";
   if (randomBtn) {
     randomBtn.addEventListener("click", async (e) => {
       e.preventDefault();
-      randomBtn.style.opacity = "0.5";
-      randomBtn.style.pointerEvents = "none";
       try {
         const res = await fetch("/api/getRandomLevel");
         const data = await res.json();
@@ -523,8 +521,6 @@ import Layout from "../layouts/Layout.astro";
         }
       } catch (err) {
         console.error("Failed to fetch random level:", err);
-        randomBtn.style.opacity = "1";
-        randomBtn.style.pointerEvents = "auto";
       }
     });
   }
