@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { inject } from "@vercel/analytics";
+import SpeedInsights from "@vercel/speed-insights/astro";
 const { title = "Rated Layouts" } = Astro.props;
 inject();
 ---
@@ -15,6 +16,7 @@ inject();
     <link href="https://fonts.cdnfonts.com/css/pusab" rel="stylesheet" />
   </head>
   <body>
+    <SpeedInsights />
     <header class="navbar">
       <div class="navbar-wrapper">
         <a href="/" class="logo">
