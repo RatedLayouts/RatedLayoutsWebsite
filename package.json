@@ -14,6 +14,7 @@
     "@astrojs/svelte": "^8.0.4",
     "@astrojs/vercel": "^10.0.4",
     "@changerawr/markdown": "^1.1.11",
+    "@vercel/analytics": "^2.0.1",
     "astro": "^6.1.4",
     "marked": "^18.0.0",
     "svelte": "^5.55.1",
