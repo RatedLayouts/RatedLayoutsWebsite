@@ -6,7 +6,9 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   integrations: [svelte()],
   output: 'static',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    prerenderEnvironment: 'node'
+  }),
   vite: {
     server: {
       proxy: {
