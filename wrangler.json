@@ -1,6 +1,6 @@
 {
   "name": "rated-layouts-website",
-  "pages_build_output_dir": "./dist/client",
+  "pages_build_output_dir": "./dist",
   "compatibility_date": "2024-05-19",
   "compatibility_flags": ["nodejs_compat"]
 }
